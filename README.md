@@ -11,3 +11,8 @@ npm install
 npm run start
 ```
 
+## Deploy
+```bash
+heroku login
+git push heroku master
+```
