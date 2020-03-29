@@ -24,11 +24,11 @@ var io = require('socket.io')(http, {
     serveClient: true,
     origins: '*:*',
     cookie: true,
-    //pingInterval: 1000,
-    //pingTimeout: 1000,
-    //upgradeTimeout: 1000,   
-    allowUpgrades: false,
-    //cookie: 'lonley_cookie',
+    pingInterval: 1000,
+    pingTimeout: 1000,
+    upgradeTimeout: 1000,   
+    allowUpgrades: true,
+    cookie: 'ppok',
     //cookiePath:'/',
     //cookieHttpOnly:true
 });
