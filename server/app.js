@@ -10,7 +10,7 @@ const storage    = path.join(__dirname, "..", 'storage');
  * WebSocket Configuration
  */
 var io = require('socket.io')(http, {
-    handlePreflightRequest: (req, res) => {
+    /*handlePreflightRequest: (req, res) => {
         const headers = {
             "Access-Control-Allow-Headers": "Content-Type, Authorization",
             "Access-Control-Allow-Origin": req.headers.origin,
@@ -19,16 +19,16 @@ var io = require('socket.io')(http, {
         };
         res.writeHead(200, headers);
         res.end();
-    },
+    },*/
     // path: '/',
-    serveClient: true,
-    origins: '*:*',
-    cookie: true,
-    pingInterval: 1000,
-    pingTimeout: 1000,
-    upgradeTimeout: 1000,   
-    allowUpgrades: true,
-    cookie: 'ppok',
+    //serveClient: true,
+    //origins: '*:*',
+    //cookie: true,
+    //pingInterval: 1000,
+    //pingTimeout: 1000,
+    //upgradeTimeout: 1000,   
+    //allowUpgrades: true,
+    //cookie: 'ppok',
     //cookiePath:'/',
     //cookieHttpOnly:true
 });

@@ -2,9 +2,9 @@ jQuery(document).ready(function($) {
   const socket = io('/pocker', {
     transportOptions: {
             polling: {
-            extraHeaders: {
-                'Authorization': 'Bearer abc',
-            },
+                extraHeaders: {
+                    'Authorization': 'Bearer abc',
+                },
             },
         },
     });
