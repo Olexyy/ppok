@@ -1,5 +1,13 @@
 jQuery(document).ready(function($) {
-    var socket = io('/pocker');
+  const socket = io('/pocker', {
+    transportOptions: {
+            polling: {
+            extraHeaders: {
+                'Authorization': 'Bearer abc',
+            },
+            },
+        },
+    });
     var countItem = $('#count');
     var tableItems = $('#table_body');
     var topicItem = $('#topic');

@@ -4,6 +4,8 @@
 ## Installing
 ```bash
 npm install
+// Install vue cli globally
+npm install -g @vue/cli @vue/cli-service-global
 ```
 
 ## Run

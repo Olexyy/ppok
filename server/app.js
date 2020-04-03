@@ -33,10 +33,26 @@ var io = require('socket.io')(http, {
     //cookieHttpOnly:true
 });
 
+const isValidJwt = (header) => {
+    const token = header.split(' ')[1];
+    if (token === 'abc') {
+      return true;
+    } else {
+      return false;
+    }
+  };
+
 /**
 * Pocker backend implementation.
 */
 const pockerPlayers = io.of('/pocker');
+pockerPlayers.use((socket, next) => {
+    const header = socket.handshake.headers['authorization'];
+    if (isValidJwt(header)) {
+      return next();
+    }
+    return next(new Error('authentication error'));
+});
 const pockerApp = {
     players: {},
     topic: '',
