@@ -58,11 +58,11 @@ const pockerApp = {
     topic: '',
     discuss: false,
 };
-pockerPlayers.on('connect', function(socket){
-    pockerApp.players[socket.id] = {name:'', vote: ''};
+pockerPlayers.on('connect', function(socket) {
+    //pockerApp.players[socket.id] = {name:'', vote: '',uuid:''};
+    //pockerPlayers.emit('status', pockerApp);
     console.log(socket.id);
     console.log(socket.request.headers.cookie);
-    pockerPlayers.emit('status', pockerApp);
     console.log('pocker connected');
     socket.on('disconnect', function() {
         delete(pockerApp.players[socket.id]);
@@ -70,6 +70,9 @@ pockerPlayers.on('connect', function(socket){
         console.log('pocker disconnected');
     });
     socket.on('update', (prop, value) => {
+        if (!pockerApp.players.hasOwnProperty(socket.id)) {
+            pockerApp.players[socket.id] = {name:'', vote: ''};
+        }
         pockerApp.players[socket.id][prop] = value;
         pockerPlayers.emit('status', pockerApp);
         console.log('pocker update updated');

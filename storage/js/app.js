@@ -1,12 +1,15 @@
 jQuery(document).ready(function($) {
-  const socket = io('/pocker', {
-    transportOptions: {
+    const socket = io('/pocker', {
+        transportOptions: {
             polling: {
                 extraHeaders: {
                     'Authorization': 'Bearer abc',
                 },
             },
         },
+    });
+    $(window).on( "unload", function(){
+        socket.close();
     });
     var countItem = $('#count');
     var tableItems = $('#table_body');
@@ -155,5 +158,4 @@ jQuery(document).ready(function($) {
             timerItem.text('');
         }
     });
-
 });
