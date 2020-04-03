@@ -8,32 +8,32 @@ jQuery(document).ready(function($) {
             },
         },
     });
-    $(window).on( "unload", function(){
+    $(window).on('unload', function() {
         socket.close();
     });
-    var countItem = $('#count');
     var tableItems = $('#table_body');
     var topicItem = $('#topic');
     var nameItem = $('#name');
     var changeName = $("#change_name");
     var discussItem = $('#discuss');
     var timerItem = $('#timer');
-    var discuss;
-    var timer;
-    var storeName = localStorage.getItem('pocker_name');
     var cards = $('.mdl-card-pocker-card');
+    var storeName = localStorage.getItem('pocker_name');
+    var dialogName = document.getElementById('name_dialog');
+    var dialogError = document.getElementById('error_dialog');
+    var dialogStart = document.getElementById('start_dialog');
+    var discuss = false;
+    var timer = null;
     nameItem.val(storeName);
-    var dialog = document.querySelector('dialog');
-    var statusObject;
-    dialogPolyfill.registerDialog(dialog);
-    if (storeName) {
-        socket.emit('update', 'name', storeName);
-    }
+    dialogPolyfill.registerDialog(dialogName);
+    dialogPolyfill.registerDialog(dialogError);
+    dialogPolyfill.registerDialog(dialogStart);
+    dialogStart.showModal();
     topicItem.on('blur', function() {
         socket.emit('topic', $(this).val());
     });
     changeName.on('click', function() {
-        dialog.showModal();
+        dialogName.showModal();
     });
     discussItem.on('click', function() {
         if ($(this).text() === 'Start discussion') {
@@ -47,7 +47,7 @@ jQuery(document).ready(function($) {
         if ($(this).val()) {
             localStorage.setItem('pocker_name', $(this).val());
             socket.emit('update', 'name', $(this).val());
-            dialog.close();
+            dialogName.close();
         }
     });
     cards.on('click', function() {
@@ -56,9 +56,22 @@ jQuery(document).ready(function($) {
             console.log('trigger vote');
         }
     });
-
+    socket.on('connect', function(){
+        dialogStart.close();
+        if (storeName) {
+            socket.emit('update', 'name', storeName);
+        }
+        else {
+            dialogName.showModal();
+        }
+    });
+    socket.on('error', function() {
+        dialogError.showModal();
+    });
+    socket.on('disconnect', function() {
+        dialogError.showModal();
+    });
     socket.on('status', function(data) {
-        statusObject = data;
         discuss = data.discuss;
         tableItems.empty();
         var ownId = socket.id;
@@ -118,12 +131,6 @@ jQuery(document).ready(function($) {
             }
             tableItems.append(tr);
         });
-        topicItem.val(data.topic).trigger('change');
-        data.topic ? topicItem.parent().addClass('is-dirty') : topicItem.parent().removeClass('is-dirty');
-        if (!localStorage.getItem('pocker_name')) {
-            dialog.showModal();
-        }
-        componentHandler.upgradeDom();
         if (discuss) {
             discussItem.text('Stop discussion');
             if (!timer) {
@@ -157,5 +164,8 @@ jQuery(document).ready(function($) {
         } else {
             timerItem.text('');
         }
+        topicItem.val(data.topic);
+        data.topic ? topicItem.parent().addClass('is-dirty') : topicItem.parent().removeClass('is-dirty');
+        discussItem.attr('disabled', !topicItem.val());
     });
 });
