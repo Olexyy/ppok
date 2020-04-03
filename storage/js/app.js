@@ -1,16 +1,21 @@
 jQuery(document).ready(function($) {
+    var room = null;
+    var match = window.location.pathname.match(/\/room\/(.+)/);
+    if (!match || !match.length === 2) {
+        room = 'default';
+    }
+    else {
+        room = match[1];
+    }
     const socket = io('/pocker', {
-        transportOptions: {
-            polling: {
-                extraHeaders: {
-                    'Authorization': 'Bearer abc',
-                },
-            },
-        },
+        transports: ['websocket'],
+        upgrade: false
     });
     $(window).on('unload', function() {
         socket.close();
     });
+    var roomMarker = $('#room_marker');
+    roomMarker.html(`<b>ROOM ${room.toUpperCase()}</b>`);
     var tableItems = $('#table_body');
     var topicItem = $('#topic');
     var nameItem = $('#name');
@@ -30,36 +35,36 @@ jQuery(document).ready(function($) {
     dialogPolyfill.registerDialog(dialogStart);
     dialogStart.showModal();
     topicItem.on('blur', function() {
-        socket.emit('topic', $(this).val());
+        socket.emit('topic', room, $(this).val());
     });
     changeName.on('click', function() {
         dialogName.showModal();
     });
     discussItem.on('click', function() {
         if ($(this).text() === 'Start discussion') {
-            socket.emit('discuss', true);
+            socket.emit('discuss', room, true);
         }
         else {
-            socket.emit('clear');
+            socket.emit('clear', room);
         }
     });
     nameItem.on('blur', function() {
         if ($(this).val()) {
             localStorage.setItem('pocker_name', $(this).val());
-            socket.emit('update', 'name', $(this).val());
+            socket.emit('update', room, 'name', $(this).val());
             dialogName.close();
         }
     });
     cards.on('click', function() {
         if (discuss) {
-            socket.emit('update', 'vote', $(this).data('value'));
+            socket.emit('update', room, 'vote', $(this).data('value'));
             console.log('trigger vote');
         }
     });
     socket.on('connect', function(){
         dialogStart.close();
         if (storeName) {
-            socket.emit('update', 'name', storeName);
+            socket.emit('update', room, 'name', storeName);
         }
         else {
             dialogName.showModal();

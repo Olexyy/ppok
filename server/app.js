@@ -9,92 +9,70 @@ const storage    = path.join(__dirname, "..", 'storage');
 /**
  * WebSocket Configuration
  */
-var io = require('socket.io')(http, {
-    /*handlePreflightRequest: (req, res) => {
-        const headers = {
-            "Access-Control-Allow-Headers": "Content-Type, Authorization",
-            "Access-Control-Allow-Origin": req.headers.origin,
-            "Access-Control-Allow-Credentials": true,
-            "Socket Powered By:":"Emiga Stream https://github.com/eminmuhammadi/emiga-stream.git"
-        };
-        res.writeHead(200, headers);
-        res.end();
-    },*/
-    // path: '/',
-    //serveClient: true,
-    //origins: '*:*',
-    //cookie: true,
-    //pingInterval: 1000,
-    //pingTimeout: 1000,
-    //upgradeTimeout: 1000,   
-    //allowUpgrades: true,
-    //cookie: 'ppok',
-    //cookiePath:'/',
-    //cookieHttpOnly:true
-});
-
-const isValidJwt = (header) => {
-    const token = header.split(' ')[1];
-    if (token === 'abc') {
-      return true;
-    } else {
-      return false;
-    }
-  };
+var io = require('socket.io')(http, {});
 
 /**
 * Pocker backend implementation.
 */
 const pockerPlayers = io.of('/pocker');
-pockerPlayers.use((socket, next) => {
-    const header = socket.handshake.headers['authorization'];
-    if (isValidJwt(header)) {
-      return next();
-    }
-    return next(new Error('authentication error'));
-});
 const pockerApp = {
-    players: {},
-    topic: '',
-    discuss: false,
+    rooms: {},
+    socketMap: {}
 };
 pockerPlayers.on('connect', function(socket) {
-    //pockerApp.players[socket.id] = {name:'', vote: '',uuid:''};
-    //pockerPlayers.emit('status', pockerApp);
-    console.log(socket.id);
-    console.log(socket.request.headers.cookie);
     console.log('pocker connected');
     socket.on('disconnect', function() {
-        delete(pockerApp.players[socket.id]);
-        pockerPlayers.emit('status', pockerApp);
-        console.log('pocker disconnected');
-    });
-    socket.on('update', (prop, value) => {
-        if (!pockerApp.players.hasOwnProperty(socket.id)) {
-            pockerApp.players[socket.id] = {name:'', vote: ''};
+        if (pockerApp.socketMap.hasOwnProperty(socket.id)){
+            const room = pockerApp.socketMap[socket.id];
+            delete(pockerApp[room].players[socket.id]);
+            delete(pockerApp.socketMap[socket.id]);
+            pockerPlayers.to(room).emit('status', pockerApp);
+            console.log('pocker player disconnected, room' + room);
         }
-        pockerApp.players[socket.id][prop] = value;
-        pockerPlayers.emit('status', pockerApp);
-        console.log('pocker update updated');
     });
-    socket.on('clear', () => {
-        pockerApp.discuss = false;
-        pockerApp.topic = '';
-        Object.values(pockerApp.players).forEach(player => {
+    socket.on('update', (room, prop, value) => {
+        if (!pockerApp.hasOwnProperty(room)) {
+            pockerApp[room] = {
+                players: {},
+                topic: '',
+                discuss: false,
+            };
+        }
+        if (!pockerApp[room].players.hasOwnProperty(socket.id)) {
+            pockerApp[room].players[socket.id] = {name:'', vote: ''};
+            pockerApp.socketMap[socket.id] = room;
+            socket.join(room);
+        }
+        pockerApp[room].players[socket.id][prop] = value;
+        pockerPlayers.to(room).emit('status', pockerApp[room]);
+        console.log('pocker update updated, room' + room);
+    });
+    socket.on('clear', room => {
+        pockerApp[room].discuss = false;
+        pockerApp[room].topic = '';
+        Object.values(pockerApp[room].players).forEach(player => {
             player.vote = '';
         });
-        pockerPlayers.emit('status', pockerApp);
-        console.log('pocker clear updated');
+        pockerPlayers.to(room).emit('status', pockerApp[room]);
+        console.log('pocker clear updated, room' + room);
     });
-    socket.on('topic', value => {
-        pockerApp.topic = value;
-        pockerPlayers.emit('status', pockerApp);
-        console.log('pocker topic updated');
+    socket.on('topic', (room, value) => {
+        pockerApp[room].topic = value;
+        pockerPlayers.to(room).emit('status', pockerApp[room]);
+        console.log('pocker topic updated, room' + room);
     });
-    socket.on('discuss', value => {
-        pockerApp.discuss = value;
-        pockerPlayers.emit('status', pockerApp);
-        console.log('pocker discuss updated');
+    socket.on('discuss', (room, value) => {
+        pockerApp[room].discuss = value;
+        pockerPlayers.to(room).emit('status', pockerApp[room]);
+        console.log('pocker discuss updated, room' + room);
+    });
+    socket.on('error', e => {
+        if (pockerApp.socketMap.hasOwnProperty(socket.id)) {
+            const room = pockerApp.socketMap[socket.id];
+            delete(pockerApp[room].players[socket.id]);
+            delete(pockerApp.socketMap[socket.id]);
+            console.log('pocker socket error, room' + room);
+        }
     });
 });
 /**
@@ -103,6 +81,10 @@ pockerPlayers.on('connect', function(socket) {
 app.use(express.static(path.join(storage)));
 
 app.get('/', function (req, res) {
+    res.redirect('/room/:id', {id:'default'});
+});
+
+app.get('/room/:id', function (req, res) {
     res.sendFile(path.join(storage+'/index.html'));
 });
 
