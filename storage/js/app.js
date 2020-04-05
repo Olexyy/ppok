@@ -1,13 +1,13 @@
 jQuery(document).ready(function($) {
     var room = null;
     var match = window.location.pathname.match(/\/room\/(.+)/);
-    if (!match || !match.length === 2) {
+    if (!match || match.length !== 2) {
         room = 'default';
     }
     else {
         room = match[1];
     }
-    const socket = io('/pocker', {
+    var socket = io('/pocker', {
         transports: ['websocket'],
         upgrade: false
     });
@@ -100,7 +100,7 @@ jQuery(document).ready(function($) {
         }
         
         Object.keys(data.players).forEach(function(id, i) {
-            const tr =  $("<tr></tr>");
+            var tr =  $("<tr></tr>");
             
             var vote = data.players[id].vote;
             tr.append(
@@ -108,30 +108,30 @@ jQuery(document).ready(function($) {
             );
             tr.append(
                 $('<td></td>').addClass('width-minus-100').text(data.players[id].name)
-            )
+            );
             if (vote === '') {
                 anyUnvoted = true;
                 if (discuss) {
                     tr.append(
                         $('<td></td>').addClass('width-fixed-50').html('<img class="wait-throbber" src="/assets/waiting.gif"></img>')
-                    )
+                    );
                 }
                 else {
                     tr.append(
                         $('<td></td>').addClass('width-fixed-50').html(data.players[id].vote)
-                    )
+                    );
                 }
             }
             else {
                 if (discuss && anyUnvoted) {
                     tr.append(
                         $('<td></td>').addClass('width-fixed-50').html('<span class="material-icons">done</span>')
-                    )
+                    );
                 }
                 else {
                     tr.append(
                         $('<td></td>').addClass('width-fixed-50').text(data.players[id].vote)
-                    )
+                    );
                 }
             }
             tableItems.append(tr);
