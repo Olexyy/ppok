@@ -173,4 +173,11 @@ jQuery(document).ready(function($) {
         data.topic ? topicItem.parent().addClass('is-dirty') : topicItem.parent().removeClass('is-dirty');
         discussItem.attr('disabled', !topicItem.val());
     });
+    function liveness() {
+        setTimeout(function() {
+            socket.emit('liveness');
+            liveness();
+        }, 30000);
+    }
+    liveness();
 });

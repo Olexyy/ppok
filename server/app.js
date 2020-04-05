@@ -74,6 +74,9 @@ pockerPlayers.on('connect', function(socket) {
             console.log('pocker socket error, room' + room);
         }
     });
+    socket.on('liveness', e => {
+        console.log('socket is live');
+    });
 });
 /**
  *   Storage
