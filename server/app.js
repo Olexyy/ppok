@@ -4,7 +4,7 @@ const port       = process.env.PORT || 3000;
 const app        = express();
 const fs         = require('fs');
 var http         = require('http').createServer(app);
-const storage    = path.join(__dirname, "..", 'storage');
+const storage    = path.join(__dirname, "..", 'store');
 
 /**
  * WebSocket Configuration
@@ -35,7 +35,7 @@ pockerPlayers.on('connect', function(socket) {
             pockerApp[room] = {
                 players: {},
                 topic: '',
-                discuss: false,
+                discuss: 'idle'
             };
         }
         if (!pockerApp[room].players.hasOwnProperty(socket.id)) {
@@ -48,7 +48,7 @@ pockerPlayers.on('connect', function(socket) {
         console.log('pocker update updated, room' + room);
     });
     socket.on('clear', room => {
-        pockerApp[room].discuss = false;
+        pockerApp[room].discuss = 'idle';
         pockerApp[room].topic = '';
         Object.values(pockerApp[room].players).forEach(player => {
             player.vote = '';
@@ -84,7 +84,7 @@ pockerPlayers.on('connect', function(socket) {
 app.use(express.static(path.join(storage)));
 
 app.get('/', function (req, res) {
-    res.redirect('/room/:id', {id:'default'});
+    res.sendFile(path.join(storage+'/index.html'));
 });
 
 app.get('/room/:id', function (req, res) {
