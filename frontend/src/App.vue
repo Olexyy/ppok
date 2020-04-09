@@ -70,8 +70,14 @@
 			dialogPolyfill.registerDialog(dialogError);
 			dialogPolyfill.registerDialog(dialogStart);
 			dialogStart.showModal();
-			topicItem.on('blur', function() {
-				socket.emit('topic', $this.$store.state.room, $(this).val());
+			topicItem.on('blur keypress', function(e) {
+        		if (e.type !== 'keypress' || e.keyCode === 13) {
+					socket.emit('topic', $this.$store.state.room, $(this).val());
+					if (e.type === 'keypress') {
+						$(this).blur();
+						$(this).parent().removeClass('is-focused');
+					}
+				}
 			});
 			changeName.on('click', function() {
 				dialogName.showModal();
@@ -87,11 +93,13 @@
 					socket.emit('clear', $this.$store.state.room);
 				}
 			});
-			nameItem.on('blur', function() {
-				if ($(this).val()) {
-					localStorage.setItem('pocker_name', $(this).val());
-					socket.emit('update', $this.$store.state.room, 'name', $(this).val());
-					dialogName.close();
+			nameItem.on('blur keypress', function(e) {
+        		if (e.type !== 'keypress' || e.keyCode === 13) {
+					if ($(this).val()) {
+						localStorage.setItem('pocker_name', $(this).val());
+						socket.emit('update', $this.$store.state.room, 'name', $(this).val());
+						dialogName.close();
+					}
 				}
 			});
 			socket.on('connect', function(){

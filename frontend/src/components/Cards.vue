@@ -33,8 +33,8 @@
     <button :disabled="vote === '?' || !canBeEnabled" v-on:click="onClick" data-value="?" class="mdl-button mdl-card-pocker-card mdl-shadow--2dp mdl-cell mdl-cell--1-col">
       ?
     </button>
-    <button :disabled="vote === 'coffee' || !canBeEnabled" v-on:click="onClick" data-value="coffee" class="mdl-button mdl-card-pocker-card mdl-shadow--2dp mdl-cell mdl-cell--1-col">
-        <span class="material-icons">
+    <button :disabled="vote === 'break' || !canBeEnabled" v-on:click="onClick" data-value="break" class="mdl-button mdl-card-pocker-card mdl-shadow--2dp mdl-cell mdl-cell--1-col">
+        <span data-value="break" class="material-icons">
           free_breakfast
         </span>
     </button>
