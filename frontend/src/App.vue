@@ -44,17 +44,13 @@
 		}
 		this.$store.dispatch('setRoom', room).then(() => {
 			var socket = window.io('/pocker', {
-			transports: ['websocket'],
-			upgrade: false
+				transports: ['websocket'],
+				upgrade: false
 			});
 			this.$store.dispatch('setSocket', socket);
-			$(window).on('unload', function() {
+			window.addEventListener('unload', () => {
 				if (socket) socket.close();
 			});
-			var roomMarker = $('#room_marker');
-			roomMarker.html(`<b>ROOM ${this.$store.state.room.toUpperCase()}</b>`);
-			var tableItems = $('#table_body');
-			var topicItem = $('#topic');
 			var nameItem = $('#name');
 			var changeName = $("#change_name");
 			var discussItem = $('#discuss');
@@ -70,15 +66,6 @@
 			dialogPolyfill.registerDialog(dialogError);
 			dialogPolyfill.registerDialog(dialogStart);
 			dialogStart.showModal();
-			topicItem.on('blur keypress', function(e) {
-        		if (e.type !== 'keypress' || e.keyCode === 13) {
-					socket.emit('topic', $this.$store.state.room, $(this).val());
-					if (e.type === 'keypress') {
-						$(this).blur();
-						$(this).parent().removeClass('is-focused');
-					}
-				}
-			});
 			changeName.on('click', function() {
 				dialogName.showModal();
 			});
@@ -146,15 +133,12 @@
 						}
 					} else { // state idle
 						discussItem.text('Start discussion');
-						discussItem.attr('disabled', !topicItem.val());
 						if (timer) {
 							timer = null;
 						}
 						timerItem.text('');
 					}
-					topicItem.val(data.topic);
-					data.topic ? topicItem.parent().addClass('is-dirty') : topicItem.parent().removeClass('is-dirty');
-					discussItem.attr('disabled', !topicItem.val());
+					discussItem.attr('disabled', !$this.$store.state.topic);
 				});
 			});
 			const liveness = () => {

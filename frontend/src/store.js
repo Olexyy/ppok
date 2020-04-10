@@ -5,9 +5,10 @@ const store = {
 		instance: null,
 		anyUnvoted: true,
 		discuss: 'idle',
-		room: null,
+		room: '',
 		socket: null,
 		vote: '',
+		topic: '',
 	},
 	mutations: {
 		setRoom (state, value) {
@@ -22,16 +23,19 @@ const store = {
 		setInstance (state, value) {
 			state.instance = value;
 			let unvoted = false;
-			Object.keys(value.players).forEach(function(id) {
-                if (value.players[id].vote == '') {
-                    unvoted = true;
-				}
-				if (id === state.socket.id) {
-					state.vote = value.players[id].vote;
-				}          
-			});
+			if (value.hasOwnProperty('players')) {
+				Object.keys(value.players).forEach(function(id) {
+					if (value.players[id].vote == '') {
+						unvoted = true;
+					}
+					if (id === state.socket.id) {
+						state.vote = value.players[id].vote;
+					}          
+				});
+			}
 			state.anyUnvoted = unvoted;
 			state.discuss = value.discuss;
+			state.topic = value.topic;
 		},
 	},
 	actions: {

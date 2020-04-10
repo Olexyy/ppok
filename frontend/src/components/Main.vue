@@ -4,18 +4,17 @@
       <div class="mdl-grid">
         <div class="demo-card-wide mdl-card mdl-shadow--2dp mdl-cell mdl-cell--12-col">
           <div class="mdl-card__title">
-            <h3 class="mdl-card__title-text"><span id='room_marker'></span></h3>
+            <h3 class="mdl-card__title-text">
+              <span id='room_marker'>
+                <b v-if="room">ROOM {{room.toUpperCase()}}</b>
+              </span>
+            </h3>
           </div>
           <div class="mdl-card__supporting-text">
             Write topic and click start to indicate discussion starts.
           </div>
           <div class="mdl-card__actions mdl-card--border"></div>
-          <div class="mdl-grid mdl-cell mdl-cell--12-col">
-            <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label mdl-cell mdl-cell--12-col">
-              <input class="mdl-textfield__input" type="text" id="topic" name="topic">
-              <label class="mdl-textfield__label" for="topic">Topic...</label>
-            </div>
-          </div>
+          <topic/>  
           <cards/>
           <users/>
           <div class="mdl-card__actions mdl-card--border">
@@ -63,11 +62,18 @@
 <script>
   import Users from './Users.vue'
   import Cards from './Cards.vue'
+  import Topic from './Topic.vue'
   export default {
     name: 'Main',
     components: {
       Users,
-      Cards
+      Cards,
+      Topic
     },
+    computed: {
+      room() {
+        return this.$store.state.room;
+      }
+    }
   }
 </script>
