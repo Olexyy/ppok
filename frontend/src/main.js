@@ -4,8 +4,6 @@ import Vuex from 'vuex';
 import store from './store';
 
 window.io = require('./js/socket.io');
-window.jQuery = require('./js/jquery.min.js');
-window.$ = window.jQuery;
 
 Vue.config.productionTip = false;
 Vue.use(Vuex);
