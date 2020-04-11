@@ -26,7 +26,7 @@ pockerPlayers.on('connect', function(socket) {
             const room = pockerApp.socketMap[socket.id];
             delete(pockerApp[room].players[socket.id]);
             delete(pockerApp.socketMap[socket.id]);
-            pockerPlayers.to(room).emit('status', pockerApp);
+            pockerPlayers.to(room).emit('status', pockerApp[room]);
             console.log('pocker player disconnected, room' + room);
         }
     });

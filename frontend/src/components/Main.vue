@@ -18,44 +18,39 @@
           <cards/>
           <users/>
           <div class="mdl-card__actions mdl-card--border">
-            <a id="change_name" class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
+            <a id="change_name" v-on:click="onChangeNameClick" class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
               Change name
             </a>
           </div>
           <div class="mdl-card__menu">
-            <span id="timer"></span>
-            <button id="discuss" class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
+            <span v-if="time" id="timer">{{time}}</span>
+            <button
+              v-if="discuss === 'result' || (discuss === 'discuss' && !anyUnvoted)"
+              id="discuss" 
+              v-on:click="onDiscussClick"
+              class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
+              Clear data
+            </button>
+            <button
+              v-else-if="discuss === 'discuss'"
+              id="discuss" 
+              v-on:click="onDiscussClick"
+              class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
+              Stop discussion
+            </button>
+            
+            <button
+              :disabled="!topic && discuss === 'idle'"
+              v-else
+              id="discuss" 
+              v-on:click="onDiscussClick"
+              class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
               Start discussion
             </button>
           </div>
         </div>
       </div>
     </div>
-    <dialog class="mdl-dialog" id="name_dialog">
-      <h4 class="mdl-dialog__title">Name yourself</h4>
-      <div class="mdl-dialog__content">
-        <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-          <input class="mdl-textfield__input" type="text" id="name" name="name">
-          <label class="mdl-textfield__label" for="Name">Name...</label>
-        </div>
-      </div>
-    </dialog>
-    <dialog class="mdl-dialog" id="start_dialog">
-      <h4 class="mdl-dialog__title">Starting</h4>
-      <div class="mdl-dialog__content">
-        <p>
-          Please wait for connection.
-        </p>
-      </div>
-    </dialog>
-    <dialog class="mdl-dialog" id="error_dialog">
-      <h4 class="mdl-dialog__title">Error</h4>
-      <div class="mdl-dialog__content">
-        <p>
-          Something went wrong, try reload page.
-        </p>
-      </div>
-    </dialog>
   </main>
 </template>
 
@@ -73,6 +68,35 @@
     computed: {
       room() {
         return this.$store.state.room;
+      },
+      time() {
+        return this.$store.state.time;
+      },
+      discuss() {
+        return this.$store.state.discuss;
+      },
+      anyUnvoted() {
+         return this.$store.state.anyUnvoted;
+      },
+      topic() {
+        return this.$store.state.topic;
+      }
+    },
+    methods: {
+      onChangeNameClick(e) {
+        // TODO GLOBAL STORAGE
+        document.getElementById('name_dialog').showModal();
+      },
+      onDiscussClick(e) {
+				if (this.$store.state.discuss === 'idle') {
+					this.$store.state.socket.emit('discuss', this.$store.state.room, 'discuss');
+				}
+        else if (this.$store.state.discuss === 'discuss') { 
+					this.$store.state.socket.emit('discuss', this.$store.state.room, 'result');
+				}
+				else {
+					this.$store.state.socket.emit('clear', this.$store.state.room);
+				}
       }
     }
   }

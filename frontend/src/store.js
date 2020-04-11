@@ -1,7 +1,7 @@
 // store.js
 const store = {
 	state: {
-		user: {},
+		userName: '',
 		instance: null,
 		anyUnvoted: true,
 		discuss: 'idle',
@@ -9,13 +9,21 @@ const store = {
 		socket: null,
 		vote: '',
 		topic: '',
+		timer: null,
+		time: '',
 	},
 	mutations: {
+		setTimer (state, value) {
+			state.timer = value;
+		},
+		setTime (state, value) {
+			state.time = value;
+		},
 		setRoom (state, value) {
 			state.room = value;
 		},
-		setUser (state, value) {
-			state.user = value;
+		setUserName (state, value) {
+			state.userName = value;
 		},
 		setSocket (state, value) {
 			state.socket = value;
@@ -30,20 +38,55 @@ const store = {
 					}
 					if (id === state.socket.id) {
 						state.vote = value.players[id].vote;
+						state.userName = value.players[id].name;
 					}          
 				});
 			}
 			state.anyUnvoted = unvoted;
 			state.discuss = value.discuss;
 			state.topic = value.topic;
+			if (state.discuss === 'discuss') {
+				if (state.timer === null) {
+					state.timer = {
+						sec: 0,
+						getSec() {
+							let timeObj = new Date(null);
+							timeObj.setSeconds(state.timer.sec);
+							return timeObj.getUTCMinutes() + ':' + timeObj.getUTCSeconds();
+						}
+					};
+					var handle = setInterval(function() {
+						if (!state.timer) {
+							clearInterval(handle);
+						} else {
+							state.timer.sec += 1;
+							state.time = state.timer.getSec();
+						}
+					}, 1000);
+				}
+			}
+			if((!state.anyUnvoted && state.discuss === 'discuss') || state.discuss === 'result') {
+				if (state.timer !== null) {
+					state.timer = null;
+				}
+			}
+			if (state.discuss === 'idle') {
+				state.time = '';
+			}
 		},
 	},
 	actions: {
+		setTimer (context, value) {
+			context.commit('setTimer', value);
+		},
+		setTime (context, value) {
+			context.commit('setTime', value);
+		},
 		setRoom (context, value) {
 			context.commit('setRoom', value);
 		},
-		setUser (context, value) {
-			context.commit('setUser', value);
+		setUserName (context, value) {
+			context.commit('setUserName', value);
 		},
 		setInstance (context, value) {
 			context.commit('setInstance', value);
