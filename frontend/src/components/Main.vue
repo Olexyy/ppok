@@ -38,7 +38,6 @@
               class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
               Stop discussion
             </button>
-            
             <button
               :disabled="!topic && discuss === 'idle'"
               v-else
@@ -84,8 +83,7 @@
     },
     methods: {
       onChangeNameClick(e) {
-        // TODO GLOBAL STORAGE
-        document.getElementById('name_dialog').showModal();
+        this.$store.state.dialogs.name.showModal();
       },
       onDiscussClick(e) {
 				if (this.$store.state.discuss === 'idle') {

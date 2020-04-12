@@ -1,4 +1,7 @@
 // store.js
+import dialogPolyfill from 'dialog-polyfill';
+import io from './../node_modules/socket.io-client/dist/socket.io';
+
 const store = {
 	state: {
 		userName: '',
@@ -11,6 +14,7 @@ const store = {
 		topic: '',
 		timer: null,
 		time: '',
+		dialogs: {}
 	},
 	mutations: {
 		setTimer (state, value) {
@@ -27,6 +31,46 @@ const store = {
 		},
 		setSocket (state, value) {
 			state.socket = value;
+		},
+		setDialog (state, value) {
+			dialogPolyfill.registerDialog(value.element);
+			state.dialogs[value.name] = value.element;
+		},
+		initSocket (state, instance) {
+			// const socket = io('/pocker', {
+			// 	transports: ['websocket'],
+			// 	upgrade: false
+			// });
+			// window.addEventListener('unload', () => {
+			// 	if (socket) socket.close();
+			// });
+			// socket.on('connect', () => {
+			// 	state.dialogs.start.close();
+			// 	let storeName = window.localStorage.getItem('pocker_name');
+			// 	if (storeName) {
+			// 		socket.emit('update', store.state.room, 'name', storeName);
+			// 	}
+			// 	else {
+			// 		state.dialogs.name.showModal();
+			// 	}
+			// });
+			// socket.on('error', function() {
+			// 	state.dialogs.error.showModal();
+			// });
+			// socket.on('disconnect', function() {
+			// 	state.dialogs.error.showModal();
+			// });
+			// socket.on('status', function(data) {
+			// 	instance.$store.dispatch('setInstance', data);
+			// });
+			// const liveness = () => {
+			// 	setTimeout(function() {
+			// 		socket.emit('liveness');
+			// 		liveness();
+			// 	}, 30000);
+			// };
+			// instance.$store.dispatch('setSocket', socket);
+			// liveness();
 		},
 		setInstance (state, value) {
 			state.instance = value;
@@ -93,7 +137,56 @@ const store = {
 		},
 		setSocket (context, value) {
 			context.commit('setSocket', value);
-		}
+		},
+		setDialog (context, value) {
+			context.commit('setDialog', value);
+		},
+		initRoom (context) {
+			let match = window.location.pathname.match(/\/room\/(.+)/);
+			let room = null;
+			if (!match || match.length !== 2) {
+				room = 'default';
+			} else {
+				room =  match[1];
+			}
+			context.commit('setRoom', room);
+		},
+		initSocket (context) {
+			const socket = io('/pocker', {
+				transports: ['websocket'],
+				upgrade: false
+			});
+			window.addEventListener('unload', () => {
+				if (socket) socket.close();
+			});
+			socket.on('connect', () => {
+				context.state.dialogs.start.close();
+				let storeName = window.localStorage.getItem('pocker_name');
+				if (storeName) {
+					socket.emit('update', context.state.room, 'name', storeName);
+				}
+				else {
+					context.state.dialogs.name.showModal();
+				}
+			});
+			socket.on('error', function() {
+				context.state.dialogs.error.showModal();
+			});
+			socket.on('disconnect', function() {
+				context.state.dialogs.error.showModal();
+			});
+			socket.on('status', function(data) {
+				context.dispatch('setInstance', data);
+			});
+			const liveness = () => {
+				setTimeout(function() {
+					socket.emit('liveness');
+					liveness();
+				}, 30000);
+			};
+			liveness();
+			context.commit('setSocket', socket);
+		},
 	},
 };
 
