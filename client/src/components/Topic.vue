@@ -1,6 +1,6 @@
 <template>
   <div class="mdl-grid mdl-cell mdl-cell--12-col">
-    <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label mdl-cell mdl-cell--12-col">
+    <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label mdl-cell mdl-cell--11-col">
       <input 
         v-model="topic"
         v-on:blur="onBlur"
@@ -12,6 +12,14 @@
         name="topic">
       <label class="mdl-textfield__label" for="topic">Topic...</label>
     </div>
+    <button
+      :disabled="!validTopic"
+      v-on:click="onReferenceClick"
+      class="mdl-button mdl-card-pocker-card mdl-shadow--2dp mdl-cell mdl-cell--1-col">
+      <span class="material-icons">
+        open_in_new
+      </span>
+    </button>
   </div>
 </template>
 
@@ -19,6 +27,14 @@
   export default {
     name: 'Topic',
     methods: {
+      validUrl(string) {
+        try {
+          new URL(string);
+        } catch (_) {
+          return false;
+        }
+        return true;
+      },
       onBlur(e) {
         this.handleEvent(e);
       },
@@ -42,6 +58,13 @@
         else {
           el.parentNode.classList.remove('is-dirty');
         }
+      },
+      onReferenceClick(e) {
+        const topic = this.$store.state.topic;
+        if (topic && this.validUrl(topic)) {
+          const win = window.open(topic, '_blank');
+          win.focus();
+        }
       }
     },
     computed: {
@@ -57,6 +80,9 @@
           return this.$store.state.topic;
         },
         set(value) { }
+      },
+      validTopic() {
+        return this.$store.state.topic && this.validUrl(this.$store.state.topic);
       }
     },
   }

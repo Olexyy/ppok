@@ -48,7 +48,7 @@
 				if (this.$store.state.discuss === 'idle') {
 					this.$store.state.socket.emit('discuss', this.$store.state.room, 'discuss');
 				}
-        else if (this.$store.state.discuss === 'discuss') { 
+        else if (this.$store.state.discuss === 'discuss' && this.$store.state.anyUnvoted) { 
 					this.$store.state.socket.emit('discuss', this.$store.state.room, 'result');
 				}
 				else {
