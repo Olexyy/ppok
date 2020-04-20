@@ -4,7 +4,9 @@
   "description": "Planning pocker",
   "main": "./server/app.js",
   "scripts": {
-    "start": "cd server && node app.js"
+    "start": "cd server && node app.js",
+    "watch-cli": "cd client && npm run watch",
+    "build-cli": "cd client && npm run build"
   },
   "devDependencies": {
     "nodemon": "^1.19.1"

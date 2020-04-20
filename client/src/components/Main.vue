@@ -14,12 +14,21 @@
             Write topic and click start to indicate discussion starts.
           </div>
           <div class="mdl-card__actions mdl-card--border"></div>
-          <Topic/>  
+          <Topic/>
+          <Repo/>
           <Cards/>
           <Users/>
           <div class="mdl-card__actions mdl-card--border">
-            <a id="change_name" v-on:click="onChangeNameClick" class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
+            <a v-on:click="onChangeNameClick" class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
               Change name
+            </a>
+            <a v-if="repoConnect && !iAmRepoConnect" class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect"
+              disabled="true">
+              Repo connected
+            </a>
+            <a v-else class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect"
+              v-on:click="onConnectRepoClick">
+              Connect repo
             </a>
           </div>
           <Menu/>
@@ -34,22 +43,33 @@
   import Cards from './Cards.vue'
   import Topic from './Topic.vue'
   import Menu from './Menu.vue'
+  import Repo from './Repo.vue'
   export default {
     name: 'Main',
     components: {
       Users,
       Cards,
       Topic,
-      Menu
+      Menu,
+      Repo
     },
     computed: {
       room() {
         return this.$store.state.room;
+      },
+      repoConnect() {
+        return this.$store.state.repoConnect;
+      },
+      iAmRepoConnect() {
+        return this.$store.state.iAmRepoConnect;
       }
     },
     methods: {
       onChangeNameClick(e) {
         this.$store.state.dialogs.name.showModal();
+      },
+      onConnectRepoClick(e) {
+        this.$store.state.dialogs.repo.showModal();
       },
     }
   }

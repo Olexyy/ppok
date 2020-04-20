@@ -46,7 +46,7 @@
         }
       },
       handleEvent(e) {
-        this.$store.state.socket.emit('topic', this.$store.state.room, e.target.value);
+        this.$store.dispatch('setTopic', e.target.value);
       },
       onChange(e) {
         this.handleClasses(e.target, e.target.value);

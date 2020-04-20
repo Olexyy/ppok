@@ -11,7 +11,8 @@
       <tbody v-if="instance" id="table_body">
         <tr v-for="(player, id, i) in instance.players" :key="`ind-${id}-${i}`">
           <td class="width-fixed-50">{{ i + 1 }}</td>
-          <td class="width-minus-100">{{ player.name }}</td>
+          <td v-if="player.repoConnect" class="width-minus-100">{{ player.name }}(connected repo)</td>
+          <td v-else class="width-minus-100">{{ player.name }}</td>
           <td v-if="player.vote === '' && discuss === 'discuss'" class="width-fixed-50">
             <img class="wait-throbber" src="./../assets/waiting.gif"/>
           </td>
@@ -39,7 +40,7 @@
       },
       discuss() {
 				return this.$store.state.discuss;
-      }
+      },
     },
   }
 </script>

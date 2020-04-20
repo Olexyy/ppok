@@ -1,9 +1,11 @@
 // store.js
 import dialogPolyfill from 'dialog-polyfill';
 import io from './../node_modules/socket.io-client/dist/socket.io';
+import GithubCli from './github_cli';
 
 const store = {
 	state: {
+		window: window,
 		userName: '',
 		instance: null,
 		anyUnvoted: true,
@@ -14,9 +16,43 @@ const store = {
 		topic: '',
 		timer: null,
 		time: '',
-		dialogs: {}
+		dialogs: {},
+		repoConnect: false,
+		// Local Github variables.
+		iAmRepoConnect: false,
+		githubToken:'',
+		githubUser:'',
+		githubCli: new GithubCli(),
+		// Shared Github resources.
+		githubData: {
+			owner: '',
+			repo: '',
+			repos: [],
+			issues: [],
+			labels: [],
+			page: 1,
+			topicIssue: null,
+		}
 	},
 	mutations: {
+		setIAmRepoConnect(state, value) {
+			state.iAmRepoConnect = value;
+		},
+		setTopicIssue (state, value) {
+			state.githubData.topicIssue = value;
+		},
+		setRepos (state, value) {
+			state.githubData.repos = value;
+		},
+		setRepo (state, value) {
+			state.githubData.repo = value;
+		},
+		setIssues(state, value) {
+			state.githubData.issues = value;
+		},
+		setLabels(state, value) {
+			state.githubData.labels = value;
+		},
 		setTimer (state, value) {
 			state.timer = value;
 		},
@@ -36,45 +72,10 @@ const store = {
 			dialogPolyfill.registerDialog(value.element);
 			state.dialogs[value.name] = value.element;
 		},
-		initSocket (state, instance) {
-			// const socket = io('/pocker', {
-			// 	transports: ['websocket'],
-			// 	upgrade: false
-			// });
-			// window.addEventListener('unload', () => {
-			// 	if (socket) socket.close();
-			// });
-			// socket.on('connect', () => {
-			// 	state.dialogs.start.close();
-			// 	let storeName = window.localStorage.getItem('pocker_name');
-			// 	if (storeName) {
-			// 		socket.emit('update', store.state.room, 'name', storeName);
-			// 	}
-			// 	else {
-			// 		state.dialogs.name.showModal();
-			// 	}
-			// });
-			// socket.on('error', function() {
-			// 	state.dialogs.error.showModal();
-			// });
-			// socket.on('disconnect', function() {
-			// 	state.dialogs.error.showModal();
-			// });
-			// socket.on('status', function(data) {
-			// 	instance.$store.dispatch('setInstance', data);
-			// });
-			// const liveness = () => {
-			// 	setTimeout(function() {
-			// 		socket.emit('liveness');
-			// 		liveness();
-			// 	}, 30000);
-			// };
-			// instance.$store.dispatch('setSocket', socket);
-			// liveness();
-		},
 		setInstance (state, value) {
 			state.instance = value;
 			let unvoted = false;
+			let repoConnect = false;
 			if (value.hasOwnProperty('players')) {
 				Object.keys(value.players).forEach(function(id) {
 					if (value.players[id].vote == '') {
@@ -83,12 +84,17 @@ const store = {
 					if (id === state.socket.id) {
 						state.vote = value.players[id].vote;
 						state.userName = value.players[id].name;
-					}          
+					}
+					if (value.players[id].repoConnect) {
+						repoConnect = true;
+					}         
 				});
 			}
+			state.repoConnect = repoConnect;
 			state.anyUnvoted = unvoted;
 			state.discuss = value.discuss;
 			state.topic = value.topic;
+			state.githubData = value.githubData;
 			if (state.discuss === 'discuss') {
 				if (state.timer === null) {
 					state.timer = {
@@ -120,6 +126,15 @@ const store = {
 		},
 	},
 	actions: {
+		setIAmRepoConnect(context, value) {
+			context.commit('setIAmRepoConnect', value);
+		},
+		setIssues(context, value) {
+			context.commit('setIssues', value);
+		},
+		setLabels(context, value) {
+			context.commit('setLabels', value);
+		},
 		setTimer (context, value) {
 			context.commit('setTimer', value);
 		},
@@ -128,6 +143,25 @@ const store = {
 		},
 		setRoom (context, value) {
 			context.commit('setRoom', value);
+		},
+		setOwner(context, value) {
+			const githubData = context.state.githubData;
+			githubData.owner = value;
+			context.state.socket.emit(
+				'updateRoom', context.state.room,
+				{ githubData: githubData },
+			);
+		},
+		setRepos(context, value) {
+			const githubData = context.state.githubData;
+			githubData.repos = value;
+			context.state.socket.emit(
+				'updateRoom', context.state.room,
+				{ githubData: githubData },
+			);
+		},
+		setRepo(context, value) {
+			context.commit('setRepo', value);
 		},
 		setUserName (context, value) {
 			context.commit('setUserName', value);
@@ -140,6 +174,17 @@ const store = {
 		},
 		setDialog (context, value) {
 			context.commit('setDialog', value);
+		},
+		setTopic(context, value) {
+			context.state.socket.emit('topic', context.state.room, value);
+		},
+		setTopicIssue (context, value) {
+			const githubData = context.state.githubData;
+			githubData.topicIssue = value;
+			context.state.socket.emit(
+				'updateRoom', context.state.room,
+				{ topic: value.html_url, githubData: githubData },
+			);
 		},
 		initRoom (context) {
 			let match = window.location.pathname.match(/\/room\/(.+)/);
@@ -162,12 +207,26 @@ const store = {
 			socket.on('connect', () => {
 				context.state.dialogs.start.close();
 				let storeName = window.localStorage.getItem('pocker_name');
+				let pockerData = window.localStorage.getItem('pocker_data');
 				if (storeName) {
 					socket.emit('update', context.state.room, 'name', storeName);
 				}
 				else {
 					context.state.dialogs.name.showModal();
 				}
+				if (pockerData) pockerData = JSON.parse(pockerData);
+				context.state.githubCli.fromObject(pockerData).then(data => {
+					if (data) {
+						context.state.socket.emit('update', context.state.room, 'repoConnect', true);
+						context.dispatch('setIAmRepoConnect', true);
+						context.state.githubUser = context.state.githubCli.user;
+						context.state.githubToken = context.state.githubCli.token;
+						context.dispatch('setOwner', context.state.githubCli.owner);
+						context.state.githubCli.getRepos().then(repos => {
+							context.dispatch('setRepos', repos);
+						});
+					}
+				});
 			});
 			socket.on('error', function() {
 				context.state.dialogs.error.showModal();

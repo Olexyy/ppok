@@ -35,11 +35,20 @@ pockerPlayers.on('connect', function(socket) {
             pockerApp[room] = {
                 players: {},
                 topic: '',
-                discuss: 'idle'
+                discuss: 'idle',
+                githubData: {
+                    owner: '',
+                    repo: '',
+                    repos: [],
+                    issues: [],
+                    labels: [],
+                    page: 1,
+                    topicIssue: null,
+                },
             };
         }
         if (!pockerApp[room].players.hasOwnProperty(socket.id)) {
-            pockerApp[room].players[socket.id] = {name:'', vote: ''};
+            pockerApp[room].players[socket.id] = {name:'', vote: '', repoConnect: false};
             pockerApp.socketMap[socket.id] = room;
             socket.join(room);
         }
@@ -65,6 +74,18 @@ pockerPlayers.on('connect', function(socket) {
         pockerApp[room].discuss = value;
         pockerPlayers.to(room).emit('status', pockerApp[room]);
         console.log('pocker discuss updated, room' + room);
+    });
+    socket.on('githubData', (room, value) => {
+        pockerApp[room].githubData = value;
+        pockerPlayers.to(room).emit('status', pockerApp[room]);
+        console.log('pocker githubData updated, room' + room);
+    });
+    socket.on('updateRoom', (room, values) => {
+        Object.keys(values).forEach(prop => {
+            pockerApp[room][prop] = values[prop];
+        });
+        pockerPlayers.to(room).emit('status', pockerApp[room]);
+        console.log('pocker githubData updated, room' + room);
     });
     socket.on('error', e => {
         if (pockerApp.socketMap.hasOwnProperty(socket.id)) {

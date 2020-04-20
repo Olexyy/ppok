@@ -32,6 +32,41 @@
           </p>
         </div>
       </dialog>
+      <dialog class="mdl-dialog" ref="repo" id="repo_dialog">
+        <h4 class="mdl-dialog__title">Github credentials</h4>
+        <div class="mdl-dialog__content">
+          <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+          <input 
+            v-model="githubUser"
+            v-on:blur="onBlurRepo"
+            v-on:keypress="onKeyPressRepo"
+            class="mdl-textfield__input"
+            type="text"
+            name="githubUser">
+          <label class="mdl-textfield__label" for="githubUser">Github user name...</label>
+          </div>
+          <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+            <input
+              v-model="githubToken"
+              v-on:blur="onBlurRepo"
+              v-on:keypress="onKeyPressRepo"
+              class="mdl-textfield__input"
+              type="text"
+              name="githubToken">
+            <label class="mdl-textfield__label" for="githubToken">Github token...</label>
+          </div>
+          <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+            <input
+              v-model="owner"
+              v-on:blur="onBlurRepo"
+              v-on:keypress="onKeyPressRepo"
+              class="mdl-textfield__input"
+              type="text"
+              name="owner">
+            <label class="mdl-textfield__label" for="owner">Owner...</label>
+          </div>
+        </div>
+      </dialog>
     </span>
 </template>
 
@@ -45,6 +80,7 @@
       this.$store.dispatch('setDialog', {name: 'name', element: this.$refs.name});
       this.$store.dispatch('setDialog', {name: 'error', element: this.$refs.error});
       this.$store.dispatch('setDialog', {name: 'start', element: this.$refs.start});
+      this.$store.dispatch('setDialog', {name: 'repo', element: this.$refs.repo});
     },
     methods: {
       onBlur(e) {
@@ -64,6 +100,33 @@
           this.$refs.name.close();
         }
       },
+      onBlurRepo(e) {
+        this.handleEventRepo(e);
+      },
+      onKeyPressRepo(e) {
+        if (e.keyCode === 13) {
+          this.handleEventRepo(e);
+          e.target.blur();
+          e.target.parentNode.classList.remove('is-focused');
+        }
+      },
+      handleEventRepo(e) {
+          if (this.$store.state.githubUser && this.$store.state.githubToken && this.$store.state.owner) {
+            const credentials = {
+              u: this.$store.state.githubUser, t: this.$store.state.githubToken, 
+              o: this.$store.state.owner
+            }
+            this.$store.state.githubCli.fromObject(credentials).then(data => {
+                window.localStorage.setItem('pocker_data', JSON.stringify(credentials));
+                this.$store.state.socket.emit('update', this.$store.state.room, 'repoConnect', true);
+                this.$store.dispatch('setIAmRepoConnect', true);
+                this.$refs.repo.close();
+                this.$store.state.githubCli.getRepos().then(repos => {
+                  this.$store.dispatch('setRepos', repos);
+                });
+            });
+          }
+      },
 	  },
     computed: {
       userName: {
@@ -71,6 +134,33 @@
           return this.$store.state.userName;
         },
         set(value) { }
+      },
+      githubUser: {
+        get() {
+          return this.$store.state.githubUser;
+        },
+        set(value) {
+          return this.$store.state.githubUser = value;
+        }
+      },
+      githubToken: {
+        get() {
+          return this.$store.state.githubToken;
+        },
+        set(value) { 
+          this.$store.state.githubToken = value;
+        }
+      },
+      owner: {
+        get() {
+          return this.$store.state.owner;
+        },
+        set(value) { 
+          this.$store.state.owner = value;
+        }
+      },
+      updated() {
+        window.componentHandler.upgradeDom();
       }
     }
   }
