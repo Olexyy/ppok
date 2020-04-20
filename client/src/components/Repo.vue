@@ -42,7 +42,7 @@
         <button v-for="(label, i) in topicIssue.labels" :key="`ind-${label.id}-${i}`" v-bind:style="{ background: '#'+label.color}" class="mdl-button mdl-shadow--2dp mdl-cell mdl-cell--2-col">
           {{label.name}}
         </button>
-    </div>
+      </div>
     </div>
     <div v-else class="mdl-grid mdl-cell mdl-cell--12-col">
       No issue is selected as topic yet.
@@ -76,7 +76,7 @@
     </div>
   </div>
   <div v-else class="mdl-grid mdl-cell mdl-cell--12-col">
-    <button :disabled="!repos.length" class="mdl-button mdl-card-pocker-card mdl-shadow--2dp mdl-cell mdl-cell--1-col">
+    <!--button :disabled="!repos.length" class="mdl-button mdl-card-pocker-card mdl-shadow--2dp mdl-cell mdl-cell--1-col">
       <span class="material-icons">
         keyboard_arrow_left
       </span>
@@ -93,7 +93,7 @@
       <span class="material-icons">
         keyboard_arrow_right
       </span>
-    </button>
+    </button-->
     <div v-if="labels.length" class="mdl-grid mdl-cell mdl-cell--12-col">
       <button :disabled="!topicIssue" :data-label="label.name" v-on:click="setLabel" v-for="(label, i) in labels" :key="`ind-${label.id}-${i}`" v-bind:style="{ background: '#'+label.color}" class="mdl-button mdl-shadow--2dp mdl-cell mdl-cell--1-col">
         {{label.name}}
@@ -118,10 +118,10 @@
         <button v-for="(label, i) in topicIssue.labels" :key="`ind-${label.id}-${i}`" v-bind:style="{ background: '#'+label.color}" class="mdl-button mdl-shadow--2dp mdl-cell mdl-cell--2-col">
           {{label.name}}
         </button>
-    </div>
+      </div>
     </div>
     <div v-else class="mdl-grid mdl-cell mdl-cell--12-col">
-      No issue is selected as topic yet.
+      No issue is selected as topic yet (waiting for issues list).
     </div>
     <div v-if="issues.length" class="mdl-grid mdl-cell mdl-cell--12-col">
       <div v-for="(issue, i) in issues" :key="`ind-${issue.number}-${i}`"
@@ -138,9 +138,9 @@
           </div>
         </div>
         <div class="mdl-card__menu">
-          <button :data-index="i" v-on:click="setTopic" class="mdl-button mdl-button--colored mdl-js-buttont">
+          <!--button :data-index="i" v-on:click="setTopic" class="mdl-button mdl-button--colored mdl-js-buttont">
             Set topic
-          </button>
+          </button-->
           <button :data-toggle="`ind-${issue.number}-${i}`" v-on:click="doToggle" class="mdl-button mdl-button--colored mdl-js-button">
             Details
           </button>
@@ -173,13 +173,13 @@
         return md.render(string);
       },
       repoChange(e) {
-        const $this = this;
+        console.log(e.target.value);
         this.$store.dispatch('setRepo', e.target.value);
         if (e.target.value) {
           this.$store.state.githubCli.getIssues(this.repo).then(issues => {
-            $this.$store.dispatch('setIssues', issues);
+            this.$store.dispatch('setIssues', issues);
           });
-          this.collectLabels(1, []);
+          this.$store.dispatch('setLabels');
         }
       },
       doToggle(e) {
@@ -195,20 +195,6 @@
         const index = e.target.getAttribute('data-index');
         this.$store.dispatch('setTopicIssue', this.issues[index]);
       },
-      collectLabels(page, collection) {
-        const $this = this;
-        this.$store.state.githubCli.getLabels($this.repo, page).then(labels => {
-            // todo filter
-            if (labels.length) {
-              collection = collection.concat(labels);
-              $this.collectLabels(page+1, collection);
-            }
-            else {
-              collection = collection.filter(label => label.name.match(/.*\[.+\].*/));
-              $this.$store.dispatch('setLabels', collection);
-            }
-          });
-      }
     },
     computed: {
       repos() {
@@ -231,10 +217,10 @@
       }
     },
     updated() {
-      //window.componentHandler.upgradeDom();
       if(!this.repo) {
         window.getmdlSelect.init('.getmdl-select');
       }
+      window.componentHandler.upgradeAllRegistered();
     }
   }
 </script>

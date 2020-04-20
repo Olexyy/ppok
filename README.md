@@ -16,5 +16,7 @@ npm run start
 ## Deploy
 ```bash
 heroku login
-git push heroku master
+git push heroku master:branch
 ```
+// heroku -> tmcpp tm-pp
+// master vuejs repo

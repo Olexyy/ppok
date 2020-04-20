@@ -84,13 +84,10 @@ const store = {
 					if (id === state.socket.id) {
 						state.vote = value.players[id].vote;
 						state.userName = value.players[id].name;
-					}
-					if (value.players[id].repoConnect) {
-						repoConnect = true;
+						state.iAmRepoConnect = value.players[id].repoConnect;
 					}         
 				});
 			}
-			state.repoConnect = repoConnect;
 			state.anyUnvoted = unvoted;
 			state.discuss = value.discuss;
 			state.topic = value.topic;
@@ -126,14 +123,32 @@ const store = {
 		},
 	},
 	actions: {
-		setIAmRepoConnect(context, value) {
-			context.commit('setIAmRepoConnect', value);
+		setRepoConnect(context, value) {
+			context.state.socket.emit('update', context.state.room, 'repoConnect', value);
 		},
-		setIssues(context, value) {
-			context.commit('setIssues', value);
-		},
-		setLabels(context, value) {
-			context.commit('setLabels', value);
+		setLabels(context) {
+			const collectLabels = (page, collection) => {
+				const repo = context.state.githubData.repo;
+				if (repo) {
+					context.state.githubCli.getLabels(repo, page).then(labels => {
+						if (labels.length) {
+							collection = collection.concat(labels);
+							collectLabels(page+1, collection);
+						}
+						else {
+							collection = collection.filter(label => label.name.match(/.*\[.+\].*/));
+							const githubData = context.state.githubData;
+							githubData.labels = collection;
+							context.state.socket.emit(
+								'updateRoom', context.state.room,
+								{ githubData: githubData },
+							);
+						}
+					
+					});
+				}
+			};
+			collectLabels(1, []);
 		},
 		setTimer (context, value) {
 			context.commit('setTimer', value);
@@ -161,7 +176,20 @@ const store = {
 			);
 		},
 		setRepo(context, value) {
-			context.commit('setRepo', value);
+			const githubData = context.state.githubData;
+			githubData.repo = value;
+			context.state.socket.emit(
+				'updateRoom', context.state.room,
+				{ githubData: githubData },
+			);
+		},
+		setIssues(context, value) {
+			const githubData = context.state.githubData;
+			githubData.issues = value;
+			context.state.socket.emit(
+				'updateRoom', context.state.room,
+				{ githubData: githubData },
+			);
 		},
 		setUserName (context, value) {
 			context.commit('setUserName', value);
@@ -217,14 +245,14 @@ const store = {
 				if (pockerData) pockerData = JSON.parse(pockerData);
 				context.state.githubCli.fromObject(pockerData).then(data => {
 					if (data) {
-						context.state.socket.emit('update', context.state.room, 'repoConnect', true);
-						context.dispatch('setIAmRepoConnect', true);
+						context.dispatch('setRepoConnect', true);
 						context.state.githubUser = context.state.githubCli.user;
 						context.state.githubToken = context.state.githubCli.token;
 						context.dispatch('setOwner', context.state.githubCli.owner);
 						context.state.githubCli.getRepos().then(repos => {
 							context.dispatch('setRepos', repos);
 						});
+						context.dispatch('setLabels');
 					}
 				});
 			});

@@ -15,9 +15,9 @@
           </div>
           <div class="mdl-card__actions mdl-card--border"></div>
           <Topic/>
-          <Repo/>
           <Cards/>
           <Users/>
+          <Repo/>
           <div class="mdl-card__actions mdl-card--border">
             <a v-on:click="onChangeNameClick" class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
               Change name

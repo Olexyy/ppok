@@ -111,21 +111,22 @@
         }
       },
       handleEventRepo(e) {
-          if (this.$store.state.githubUser && this.$store.state.githubToken && this.$store.state.owner) {
-            const credentials = {
-              u: this.$store.state.githubUser, t: this.$store.state.githubToken, 
-              o: this.$store.state.owner
-            }
-            this.$store.state.githubCli.fromObject(credentials).then(data => {
-                window.localStorage.setItem('pocker_data', JSON.stringify(credentials));
-                this.$store.state.socket.emit('update', this.$store.state.room, 'repoConnect', true);
-                this.$store.dispatch('setIAmRepoConnect', true);
-                this.$refs.repo.close();
-                this.$store.state.githubCli.getRepos().then(repos => {
-                  this.$store.dispatch('setRepos', repos);
-                });
-            });
+        const $this = this;
+        if (this.$store.state.githubUser && this.$store.state.githubToken && this.$store.state.githubData.owner) {
+          const credentials = {
+            u: this.$store.state.githubUser,
+            t: this.$store.state.githubToken, 
+            o: this.$store.state.githubData.owner
           }
+          this.$store.state.githubCli.fromObject(credentials).then(data => {
+              window.localStorage.setItem('pocker_data', JSON.stringify(credentials));
+              $this.$store.dispatch('setRepoConnect', true);
+              $this.$refs.repo.close();
+              $this.$store.state.githubCli.getRepos().then(repos => {
+                $this.$store.dispatch('setRepos', repos);
+              });
+          });
+        }
       },
 	  },
     computed: {
@@ -153,10 +154,10 @@
       },
       owner: {
         get() {
-          return this.$store.state.owner;
+          return this.$store.state.githubData.owner;
         },
         set(value) { 
-          this.$store.state.owner = value;
+          this.$store.state.githubData.owner = value;
         }
       },
       updated() {
