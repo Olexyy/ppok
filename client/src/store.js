@@ -81,6 +81,9 @@ const store = {
 					if (value.players[id].vote == '') {
 						unvoted = true;
 					}
+					if (value.players[id].repoConnect) {
+						repoConnect = true;
+					}
 					if (id === state.socket.id) {
 						state.vote = value.players[id].vote;
 						state.userName = value.players[id].name;
@@ -88,6 +91,7 @@ const store = {
 					}         
 				});
 			}
+			state.repoConnect = repoConnect;
 			state.anyUnvoted = unvoted;
 			state.discuss = value.discuss;
 			state.topic = value.topic;

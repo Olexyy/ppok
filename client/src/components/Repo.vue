@@ -95,7 +95,7 @@
       </span>
     </button-->
     <div v-if="labels.length" class="mdl-grid mdl-cell mdl-cell--12-col">
-      <button :disabled="!topicIssue" :data-label="label.name" v-on:click="setLabel" v-for="(label, i) in labels" :key="`ind-${label.id}-${i}`" v-bind:style="{ background: '#'+label.color}" class="mdl-button mdl-shadow--2dp mdl-cell mdl-cell--1-col">
+      <button :disabled="true" :data-label="label.name" v-on:click="setLabel" v-for="(label, i) in labels" :key="`ind-${label.id}-${i}`" v-bind:style="{ background: '#'+label.color}" class="mdl-button mdl-shadow--2dp mdl-cell mdl-cell--1-col">
         {{label.name}}
       </button>
     </div>

@@ -20,3 +20,4 @@ git push heroku master:branch
 ```
 // heroku -> tmcpp tm-pp
 // master vuejs repo
+// git push tm-pp repo:master
