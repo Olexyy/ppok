@@ -178,6 +178,11 @@ const store = {
 			socket.on('status', function(data) {
 				context.dispatch('setInstance', data);
 			});
+			socket.on('sound', function() {
+				let src = '/ding.mp3';
+				let audio = new Audio(src);
+				audio.play();
+			});
 			const liveness = () => {
 				setTimeout(function() {
 					socket.emit('liveness');

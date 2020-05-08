@@ -66,6 +66,10 @@ pockerPlayers.on('connect', function(socket) {
         pockerPlayers.to(room).emit('status', pockerApp[room]);
         console.log('pocker discuss updated, room' + room);
     });
+    socket.on('sound', (room) => {
+        pockerPlayers.to(room).emit('sound');
+        console.log('pocker sound, room' + room);
+    });
     socket.on('error', e => {
         if (pockerApp.socketMap.hasOwnProperty(socket.id)) {
             const room = pockerApp.socketMap[socket.id];

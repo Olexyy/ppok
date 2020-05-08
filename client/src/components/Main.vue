@@ -21,6 +21,9 @@
             <a id="change_name" v-on:click="onChangeNameClick" class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
               Change name
             </a>
+            <a id="play_sound" v-on:click="playSound" class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
+              Play sound
+            </a>
           </div>
           <Menu/>
         </div>
@@ -51,6 +54,9 @@
       onChangeNameClick(e) {
         this.$store.state.dialogs.name.showModal();
       },
+      playSound() {
+        this.$store.state.socket.emit('sound', this.$store.state.room);
+      }
     }
   }
 </script>
