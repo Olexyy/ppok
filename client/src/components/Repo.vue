@@ -5,11 +5,11 @@
         keyboard_arrow_left
       </span>
     </button>
-    <div v-if="repos.length" class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label getmdl-select mdl-cell mdl-cell--5-col">
+    <div v-if="repos.length" class="getmdl-select__fix-height mdl-textfield mdl-js-textfield mdl-textfield--floating-label getmdl-select mdl-cell mdl-cell--5-col">
       <input v-on:change="repoChange" type="text" value="" class="mdl-textfield__input" id="repo" readonly>
       <input type="hidden" value="" name="repo">
       <label for="repo" class="mdl-textfield__label">Repo...</label>
-      <ul for="repo" class="mdl-menu mdl-menu--bottom-left mdl-js-menu">
+      <ul for="repo" class="mdl-menu mdl-menu--top-left mdl-js-menu">
           <li v-for="(rep, i) in repos" :key="`ind-${rep.id}-${i}`" class="mdl-menu__item" :data-val="rep.name">{{rep.name}}</li>
       </ul>
     </div>
@@ -18,6 +18,14 @@
         keyboard_arrow_right
       </span>
     </button>
+    <div v-if="projects.length" class="getmdl-select__fix-height mdl-textfield mdl-js-textfield mdl-textfield--floating-label getmdl-select mdl-cell mdl-cell--5-col">
+      <input v-on:change="projectChange" type="text" value="" class="mdl-textfield__input" id="project" readonly>
+      <input type="hidden" value="" id='project-value' name="project">
+      <label for="project" class="mdl-textfield__label">Repo...</label>
+      <ul for="project" class="mdl-menu mdl-menu--top-left mdl-js-menu">
+          <li v-for="(project, i) in projects" :key="`ind-${project.id}-${i}`" class="mdl-menu__item" :data-val="project.id">{{project.name}}</li>
+      </ul>
+    </div>
     <div v-if="labels.length" class="mdl-grid mdl-cell mdl-cell--12-col">
       <button :disabled="!topicIssue" :data-label="label.name" v-on:click="setLabel" v-for="(label, i) in labels" :key="`ind-${label.id}-${i}`" v-bind:style="{ background: '#'+label.color}" class="mdl-button mdl-shadow--2dp mdl-cell mdl-cell--1-col">
         {{label.name}}
@@ -51,7 +59,7 @@
       <div v-for="(issue, i) in issues" :key="`ind-${issue.number}-${i}`"
         class="mdl-card mdl-cell--12-col" style="min-height:auto;">
         <div class="mdl-card__title">
-          <h2 class="mdl-card__title-text">{{issue.number + ' / ' + repo + ' / ' + issue.state }}</h2>
+          <h2 class="mdl-card__title-text">{{issue.number + ' / ' + issue.state }}</h2>
         </div>
         <div class="mdl-card__supporting-text">
            {{issue.title}}
@@ -173,10 +181,21 @@
         return md.render(string);
       },
       repoChange(e) {
-        console.log(e.target.value);
         this.$store.dispatch('setRepo', e.target.value);
         if (e.target.value) {
+          this.$store.dispatch('setIssues', []);
           this.$store.state.githubCli.getIssues(this.repo).then(issues => {
+            this.$store.dispatch('setIssues', issues);
+          });
+          this.$store.dispatch('setLabels');
+        }
+      },
+      projectChange(e) {
+        const val = document.getElementById('project-value').value;
+        console.log(val);
+        this.$store.dispatch('setProject', val);
+        if (val) {
+          this.$store.state.githubCli.getIssuesByProject(val).then(issues => {
             this.$store.dispatch('setIssues', issues);
           });
           this.$store.dispatch('setLabels');
@@ -199,6 +218,12 @@
     computed: {
       repos() {
         return this.$store.state.githubData.repos;
+      },
+      projects() {
+        return this.$store.state.githubData.projects;
+      },
+      project() {
+        return this.$store.state.githubData.project;
       },
       repo() {
         return this.$store.state.githubData.repo;

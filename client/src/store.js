@@ -29,24 +29,14 @@ const store = {
 			repo: '',
 			repos: [],
 			issues: [],
+			projects: [],
+			project: null,
 			labels: [],
 			page: 1,
 			topicIssue: null,
 		}
 	},
 	mutations: {
-		setIAmRepoConnect(state, value) {
-			state.iAmRepoConnect = value;
-		},
-		setTopicIssue (state, value) {
-			state.githubData.topicIssue = value;
-		},
-		setRepos (state, value) {
-			state.githubData.repos = value;
-		},
-		setRepo (state, value) {
-			state.githubData.repo = value;
-		},
 		setIssues(state, value) {
 			state.githubData.issues = value;
 		},
@@ -187,6 +177,22 @@ const store = {
 				{ githubData: githubData },
 			);
 		},
+		setProject(context, value) {
+			const githubData = context.state.githubData;
+			githubData.project = value;
+			context.state.socket.emit(
+				'updateRoom', context.state.room,
+				{ githubData: githubData },
+			);
+		},
+		setProjects(context, value) {
+			const githubData = context.state.githubData;
+			githubData.projects = value;
+			context.state.socket.emit(
+				'updateRoom', context.state.room,
+				{ githubData: githubData },
+			);
+		},
 		setIssues(context, value) {
 			const githubData = context.state.githubData;
 			githubData.issues = value;
@@ -255,6 +261,9 @@ const store = {
 						context.dispatch('setOwner', context.state.githubCli.owner);
 						context.state.githubCli.getRepos().then(repos => {
 							context.dispatch('setRepos', repos);
+						});
+						context.state.githubCli.getProjects().then(items => {
+							context.dispatch('setProjects', items);
 						});
 						context.dispatch('setLabels');
 					}
