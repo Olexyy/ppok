@@ -22,6 +22,10 @@
             {{player.vote}}
           </td>
         </tr>
+        <tr v-if="average">
+          <td class="width-fixed-50">Average:</td>
+          <td style="text-align: left;">{{average}}</td>
+        </tr>
       </tbody>
     </table>
   </div>
@@ -38,7 +42,10 @@
 				return this.$store.state.anyUnvoted;
       },
       discuss() {
-				return this.$store.state.discuss;
+                return this.$store.state.discuss;
+      },
+      average() {
+                return this.$store.state.average;
       }
     },
   }

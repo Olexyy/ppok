@@ -14,7 +14,8 @@ const store = {
 		topic: '',
 		timer: null,
 		time: '',
-		dialogs: {}
+		dialogs: {},
+		average: null,
 	},
 	mutations: {
 		setTimer (state, value) {
@@ -36,49 +37,23 @@ const store = {
 			dialogPolyfill.registerDialog(value.element);
 			state.dialogs[value.name] = value.element;
 		},
-		initSocket (state, instance) {
-			// const socket = io('/pocker', {
-			// 	transports: ['websocket'],
-			// 	upgrade: false
-			// });
-			// window.addEventListener('unload', () => {
-			// 	if (socket) socket.close();
-			// });
-			// socket.on('connect', () => {
-			// 	state.dialogs.start.close();
-			// 	let storeName = window.localStorage.getItem('pocker_name');
-			// 	if (storeName) {
-			// 		socket.emit('update', store.state.room, 'name', storeName);
-			// 	}
-			// 	else {
-			// 		state.dialogs.name.showModal();
-			// 	}
-			// });
-			// socket.on('error', function() {
-			// 	state.dialogs.error.showModal();
-			// });
-			// socket.on('disconnect', function() {
-			// 	state.dialogs.error.showModal();
-			// });
-			// socket.on('status', function(data) {
-			// 	instance.$store.dispatch('setInstance', data);
-			// });
-			// const liveness = () => {
-			// 	setTimeout(function() {
-			// 		socket.emit('liveness');
-			// 		liveness();
-			// 	}, 30000);
-			// };
-			// instance.$store.dispatch('setSocket', socket);
-			// liveness();
-		},
 		setInstance (state, value) {
 			state.instance = value;
 			let unvoted = false;
-			if (value.hasOwnProperty('players')) {
+			let count = 0;
+			let sum = 0;
+			if (Object.prototype.hasOwnProperty.call(value,'players')) {
 				Object.keys(value.players).forEach(function(id) {
-					if (value.players[id].vote == '') {
+					if (value.players[id].vote === '') {
 						unvoted = true;
+					}
+					else {
+						count += 1;
+						let num = parseFloat(value.players[id].vote);
+						if (isNaN(num)) {
+							num = 0;
+						}
+						sum += num;
 					}
 					if (id === state.socket.id) {
 						state.vote = value.players[id].vote;
@@ -113,9 +88,11 @@ const store = {
 				if (state.timer !== null) {
 					state.timer = null;
 				}
+				state.average = sum/count;
 			}
 			if (state.discuss === 'idle') {
 				state.time = '';
+				state.average = null;
 			}
 		},
 	},
