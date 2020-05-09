@@ -26,6 +26,10 @@
           <td class="width-fixed-50">Average:</td>
           <td style="text-align: left;">{{average}}</td>
         </tr>
+        <tr v-if="averageLike">
+          <td class="width-fixed-50">Recommended:</td>
+          <td style="text-align: left;">{{averageLike}}</td>
+        </tr>
       </tbody>
     </table>
   </div>
@@ -42,10 +46,13 @@
 				return this.$store.state.anyUnvoted;
       },
       discuss() {
-                return this.$store.state.discuss;
+        return this.$store.state.discuss;
       },
       average() {
-                return this.$store.state.average;
+        return this.$store.state.average;
+      },
+      averageLike() {
+        return this.$store.state.averageLike;
       }
     },
   }

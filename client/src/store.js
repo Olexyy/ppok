@@ -16,6 +16,7 @@ const store = {
 		time: '',
 		dialogs: {},
 		average: null,
+		averageLike: null,
 	},
 	mutations: {
 		setTimer (state, value) {
@@ -68,10 +69,16 @@ const store = {
 				if (state.timer === null) {
 					state.timer = {
 						sec: 0,
-						getSec() {
+						getTime() {
 							let timeObj = new Date(null);
 							timeObj.setSeconds(state.timer.sec);
-							return timeObj.getUTCMinutes() + ':' + timeObj.getUTCSeconds();
+							let min = timeObj.getUTCMinutes();
+							let sec = timeObj.getUTCSeconds();
+							let hour = timeObj.getUTCHours();
+							if (min <= 9) min = `0${min}`;
+							if (sec <= 9) sec = `0${sec}`;
+							if (hour <= 9) hour = `0${hour}`;
+							return `${hour}:${min}:${sec}`;
 						}
 					};
 					var handle = setInterval(function() {
@@ -79,7 +86,7 @@ const store = {
 							clearInterval(handle);
 						} else {
 							state.timer.sec += 1;
-							state.time = state.timer.getSec();
+							state.time = state.timer.getTime();
 						}
 					}, 1000);
 				}
@@ -89,10 +96,40 @@ const store = {
 					state.timer = null;
 				}
 				state.average = sum/count;
+				state.averageLike = recomend(state.average);
 			}
 			if (state.discuss === 'idle') {
 				state.time = '';
 				state.average = null;
+				state.averageLike = null;
+			}
+			function recomend(value) {
+				const values = [
+					0.5, 1, 2, 3, 5, 8, 13, 20, 40, 100
+				];
+				let low = 0;
+				let high = 0;
+				for(var i = 0; i < values.length; i++) {
+					console.log(values[i]);
+					if (value > values[i]) {
+						low = values[i];
+					}
+					else if (value === values[i]) {
+						return values[i];
+					}
+					else {
+						high = values[i];
+						let valLow = value - low;
+						let valHigh = high - value;
+						if (valLow === valHigh) {
+							return '';
+						}
+						if (valLow < valHigh) {
+							return low;
+						}
+						return high;
+					}
+				}
 			}
 		},
 	},
