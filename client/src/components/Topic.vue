@@ -46,7 +46,7 @@
         }
       },
       handleEvent(e) {
-        this.$store.state.socket.emit('topic', this.$store.state.room, e.target.value);
+        this.$store.state.app.emit('topic', e.target.value);
       },
       onChange(e) {
         this.handleClasses(e.target, e.target.value);
@@ -60,7 +60,7 @@
         }
       },
       onReferenceClick(e) {
-        const topic = this.$store.state.topic;
+        const topic = this.$store.state.app.topic;
         if (topic && this.validUrl(topic)) {
           const win = window.open(topic, '_blank');
           win.focus();
@@ -69,20 +69,20 @@
     },
     computed: {
       room() {
-        return this.$store.state.room;
+        return this.$store.state.app.room;
       },
       topic: {
         get() {
           const el = document.getElementById('topic');
           if (el) {
-            this.handleClasses(document.getElementById('topic'), this.$store.state.topic);
+            this.handleClasses(document.getElementById('topic'), this.$store.state.app.topic);
           }
-          return this.$store.state.topic;
+          return this.$store.state.app.topic;
         },
         set(value) { }
       },
       validTopic() {
-        return this.$store.state.topic && this.validUrl(this.$store.state.topic);
+        return this.$store.state.app.topic && this.validUrl(this.$store.state.app.topic);
       }
     },
   }

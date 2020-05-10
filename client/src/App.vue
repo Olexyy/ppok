@@ -37,9 +37,8 @@
     },
     mounted() {
 		this.$store.state.dialogs.start.showModal();
-		this.$store.dispatch('initRoom').then(() => {
-			this.$store.dispatch('initSocket');
-		});
+		this.$store.state.app.initRoom();
+		this.$store.dispatch('initSocket');
 	},
   }
 </script>

@@ -49,16 +49,16 @@
         if (this.canBeEnabled) {
           const el = e.target;
           const value = el.getAttribute('data-value');
-          this.$store.state.socket.emit('update', this.$store.state.room,'vote', value);
+          this.$store.state.app.emit('update', 'vote', value);
         }
       }
     },
     computed: {
       vote() {
-        return this.$store.state.vote;
+        return this.$store.state.app.vote;
       },
       canBeEnabled() {
-				return this.$store.state.discuss === 'discuss' && this.$store.state.anyUnvoted;
+				return this.$store.state.app.discuss === 'discuss' && this.$store.state.app.anyUnvoted;
       }
     }
   }

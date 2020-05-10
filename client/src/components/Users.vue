@@ -40,19 +40,19 @@
     name: 'Users',
     computed: {
 			instance() {
-				return this.$store.state.instance;
+				return this.$store.state.app.data;
       },
       anyUnvoted() {
-				return this.$store.state.anyUnvoted;
+				return this.$store.state.app.anyUnvoted;
       },
       discuss() {
-        return this.$store.state.discuss;
+        return this.$store.state.app.discuss;
       },
       average() {
-        return this.$store.state.result.average;
+        return this.$store.state.app.result.average;
       },
       recommended() {
-        return this.$store.state.result.recommended;
+        return this.$store.state.app.result.recommended;
       }
     },
   }

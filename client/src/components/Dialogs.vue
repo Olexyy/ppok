@@ -60,7 +60,7 @@
       handleEvent(e) {
         if (e.target.value) {
           window.localStorage.setItem('pocker_name', e.target.value);
-          this.$store.state.socket.emit('update', this.$store.state.room, 'name', e.target.value);
+          this.$store.state.app.emit('update', 'name', e.target.value);
           this.$refs.name.close();
         }
       },
@@ -68,7 +68,7 @@
     computed: {
       userName: {
         get() {
-          return this.$store.state.userName;
+          return this.$store.state.app.userName;
         },
         set(value) { }
       }

@@ -31,28 +31,28 @@
     name: 'Menu',
     computed: {
       time() {
-        return this.$store.state.timer.time;
+        return this.$store.state.app.timer.time;
       },
       discuss() {
-        return this.$store.state.discuss;
+        return this.$store.state.app.discuss;
       },
       anyUnvoted() {
-         return this.$store.state.anyUnvoted;
+         return this.$store.state.app.anyUnvoted;
       },
       topic() {
-        return this.$store.state.topic;
+        return this.$store.state.app.topic;
       }
     },
     methods: {
       onDiscussClick(e) {
-				if (this.$store.state.discuss === 'idle') {
-					this.$store.state.socket.emit('discuss', this.$store.state.room, 'discuss');
+				if (this.$store.state.app.discuss === 'idle') {
+					this.$store.state.app.emit('discuss', 'discuss');
 				}
-        else if (this.$store.state.discuss === 'discuss' && this.$store.state.anyUnvoted) { 
-					this.$store.state.socket.emit('discuss', this.$store.state.room, 'result');
+        else if (this.$store.state.app.discuss === 'discuss' && this.$store.state.app.anyUnvoted) { 
+					this.$store.state.app.emit('discuss', 'result');
 				}
 				else {
-					this.$store.state.socket.emit('clear', this.$store.state.room);
+					this.$store.state.app.emit('clear');
 				}
       }
     }

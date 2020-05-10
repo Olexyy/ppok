@@ -7,7 +7,6 @@ class Timer {
     }
 
     processTime() {
-        this.sec += 1;
         let timeObj = new Date(null);
         timeObj.setSeconds(this.sec);
         let min = timeObj.getUTCMinutes();
@@ -25,11 +24,12 @@ class Timer {
             const handle = setInterval(() => {
                 if (this.stopped) {
                     clearInterval(handle);
-                    this.sec = 0;
                 } else {
+                    this.sec += 1;
                     this.processTime();
                 }
             }, 1000);
+            this.processTime();
         }
     }
 
@@ -39,6 +39,7 @@ class Timer {
 
     clear() {
         this.time = '';
+        this.sec = 0;
     }
 }
 

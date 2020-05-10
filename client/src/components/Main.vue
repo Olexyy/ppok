@@ -47,7 +47,7 @@
     },
     computed: {
       room() {
-        return this.$store.state.room;
+        return this.$store.state.app.room;
       }
     },
     methods: {
@@ -55,7 +55,7 @@
         this.$store.state.dialogs.name.showModal();
       },
       playSound() {
-        this.$store.state.socket.emit('sound', this.$store.state.room);
+        this.$store.state.app.emit('sound');
       }
     }
   }
