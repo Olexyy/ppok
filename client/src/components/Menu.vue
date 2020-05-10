@@ -1,6 +1,6 @@
 <template>
   <div class="mdl-card__menu">
-    <span v-if="time" id="timer">{{time}}</span>
+    <span v-if="time">{{time}}</span>
     <button
       v-if="discuss === 'result' || (discuss === 'discuss' && !anyUnvoted)"
       id="discuss" 
@@ -31,7 +31,7 @@
     name: 'Menu',
     computed: {
       time() {
-        return this.$store.state.time;
+        return this.$store.state.timer.time;
       },
       discuss() {
         return this.$store.state.discuss;

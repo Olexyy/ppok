@@ -1,8 +1,10 @@
 // store.js
 import dialogPolyfill from 'dialog-polyfill';
-import io from './../node_modules/socket.io-client/dist/socket.io';
+import io from 'socket.io-client/dist/socket.io';
+import Timer from './Timer';
+import Result from './Result';
 
-const store = {
+const Store = {
 	state: {
 		userName: '',
 		instance: null,
@@ -12,11 +14,9 @@ const store = {
 		socket: null,
 		vote: '',
 		topic: '',
-		timer: null,
-		time: '',
+		timer: new Timer(),
 		dialogs: {},
-		average: null,
-		averageLike: null,
+		result: new Result(),
 	},
 	mutations: {
 		setTimer (state, value) {
@@ -39,22 +39,16 @@ const store = {
 			state.dialogs[value.name] = value.element;
 		},
 		setInstance (state, value) {
+			// TODO move all business logic to separate class.
 			state.instance = value;
 			let unvoted = false;
-			let count = 0;
-			let sum = 0;
 			if (Object.prototype.hasOwnProperty.call(value,'players')) {
 				Object.keys(value.players).forEach(function(id) {
 					if (value.players[id].vote === '') {
 						unvoted = true;
 					}
 					else {
-						count += 1;
-						let num = parseFloat(value.players[id].vote);
-						if (isNaN(num)) {
-							num = 0;
-						}
-						sum += num;
+						state.result.addResult(value.players[id].vote);
 					}
 					if (id === state.socket.id) {
 						state.vote = value.players[id].vote;
@@ -65,71 +59,19 @@ const store = {
 			state.anyUnvoted = unvoted;
 			state.discuss = value.discuss;
 			state.topic = value.topic;
+			// If we just started discuss.
 			if (state.discuss === 'discuss') {
-				if (state.timer === null) {
-					state.timer = {
-						sec: 0,
-						getTime() {
-							let timeObj = new Date(null);
-							timeObj.setSeconds(state.timer.sec);
-							let min = timeObj.getUTCMinutes();
-							let sec = timeObj.getUTCSeconds();
-							let hour = timeObj.getUTCHours();
-							if (min <= 9) min = `0${min}`;
-							if (sec <= 9) sec = `0${sec}`;
-							if (hour <= 9) hour = `0${hour}`;
-							return `${hour}:${min}:${sec}`;
-						}
-					};
-					var handle = setInterval(function() {
-						if (!state.timer) {
-							clearInterval(handle);
-						} else {
-							state.timer.sec += 1;
-							state.time = state.timer.getTime();
-						}
-					}, 1000);
-				}
+				state.timer.start();
 			}
+			// If everybody voted or we force result.
 			if((!state.anyUnvoted && state.discuss === 'discuss') || state.discuss === 'result') {
-				if (state.timer !== null) {
-					state.timer = null;
-				}
-				state.average = sum/count;
-				state.averageLike = recomend(state.average);
+				state.timer.stop();
+				state.result.submit();
 			}
+			// If we have initial phase.
 			if (state.discuss === 'idle') {
-				state.time = '';
-				state.average = null;
-				state.averageLike = null;
-			}
-			function recomend(value) {
-				const values = [
-					0.5, 1, 2, 3, 5, 8, 13, 20, 40, 100
-				];
-				let low = 0;
-				let high = 0;
-				for(var i = 0; i < values.length; i++) {
-					console.log(values[i]);
-					if (value > values[i]) {
-						low = values[i];
-					}
-					else if (value === values[i]) {
-						return values[i];
-					}
-					else {
-						high = values[i];
-						let valLow = value - low;
-						let valHigh = high - value;
-						if (valLow === valHigh) {
-							return '';
-						}
-						if (valLow < valHigh) {
-							return low;
-						}
-						return high;
-					}
-				}
+				state.timer.clear();
+				state.result.clear();
 			}
 		},
 	},
@@ -156,6 +98,7 @@ const store = {
 			context.commit('setDialog', value);
 		},
 		initRoom (context) {
+			// TODO move to separate class.
 			let match = window.location.pathname.match(/\/room\/(.+)/);
 			let room = null;
 			if (!match || match.length !== 2) {
@@ -166,6 +109,7 @@ const store = {
 			context.commit('setRoom', room);
 		},
 		initSocket (context) {
+			// TODO move to separate class.
 			const socket = io('/pocker', {
 				transports: ['websocket'],
 				upgrade: false
@@ -209,4 +153,4 @@ const store = {
 	},
 };
 
-export default store;
+export default Store;
