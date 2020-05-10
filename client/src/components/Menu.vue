@@ -46,7 +46,8 @@
     methods: {
       onDiscussClick(e) {
 				if (this.$store.state.app.discuss === 'idle') {
-					this.$store.state.app.emit('discuss', 'discuss');
+          this.$store.state.app.emit('discuss', 'discuss');
+          this.$store.state.app.emit('sound');
 				}
         else if (this.$store.state.app.discuss === 'discuss' && this.$store.state.app.anyUnvoted) { 
 					this.$store.state.app.emit('discuss', 'result');

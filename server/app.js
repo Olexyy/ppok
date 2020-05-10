@@ -30,6 +30,14 @@ pockerPlayers.on('connect', function(socket) {
             console.log('pocker player disconnected, room' + room);
         }
     });
+    socket.on('error', e => {
+        if (pockerApp.socketMap.hasOwnProperty(socket.id)) {
+            const room = pockerApp.socketMap[socket.id];
+            delete(pockerApp[room].players[socket.id]);
+            delete(pockerApp.socketMap[socket.id]);
+            console.log('pocker socket error, room' + room);
+        }
+    });
     socket.on('update', (room, prop, value) => {
         if (!pockerApp.hasOwnProperty(room)) {
             pockerApp[room] = {
@@ -69,14 +77,6 @@ pockerPlayers.on('connect', function(socket) {
     socket.on('sound', (room) => {
         pockerPlayers.to(room).emit('sound');
         console.log('pocker sound, room' + room);
-    });
-    socket.on('error', e => {
-        if (pockerApp.socketMap.hasOwnProperty(socket.id)) {
-            const room = pockerApp.socketMap[socket.id];
-            delete(pockerApp[room].players[socket.id]);
-            delete(pockerApp.socketMap[socket.id]);
-            console.log('pocker socket error, room' + room);
-        }
     });
     socket.on('liveness', e => {
         console.log('socket is live');
