@@ -12,7 +12,10 @@
         <tr v-for="(player, id, i) in instance.players" :key="`ind-${id}-${i}`">
           <td class="width-fixed-50">{{ i + 1 }}</td>
           <td class="width-minus-100">{{ player.name }}</td>
-          <td v-if="player.vote === '' && discuss === 'discuss'" class="width-fixed-50">
+          <td v-if="su" class="width-fixed-50">
+            {{player.vote}}
+          </td>
+          <td v-else-if="player.vote === '' && discuss === 'discuss'" class="width-fixed-50">
             <img class="wait-throbber" src="./../assets/waiting.gif"/>
           </td>
           <td v-else-if="discuss === 'discuss' && anyUnvoted" class="width-fixed-50">
@@ -32,6 +35,7 @@
         </tr>
       </tbody>
     </table>
+    <div v-if="debugResult">{{debugResult}}</div>
   </div>
 </template>
 
@@ -53,6 +57,15 @@
       },
       recommended() {
         return this.$store.state.app.result.recommended;
+      },
+      su() {
+        return this.$store.state.app.isSU();
+      },
+      debugResult() {
+        if (this.$store.state.app.isDebug()) {
+          return this.$store.state.app.result.stringify();
+        }
+        return '';
       }
     },
   }

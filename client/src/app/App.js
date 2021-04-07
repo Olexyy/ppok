@@ -32,9 +32,7 @@ class App {
                 if (value.players[id].vote === '') {
                     unvoted = true;
                 }
-                else {
-                    this.result.addResult(value.players[id].vote);
-                }
+                this.result.addResult(value.players[id].vote, id);
                 if (id === this.socket.id) {
                     this.vote = value.players[id].vote;
                     this.userName = value.players[id].name;
@@ -66,6 +64,22 @@ class App {
 
     emit(name, value1 = null, value2 = null) {
         return this.socket.emit(name, this.room, value1, value2);
+    }
+
+    getQueryParam(name, url = window.location.href) {
+        const regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)');
+        const results = regex.exec(url);
+        if (!results) return null;
+        if (!results[2]) return '';
+        return decodeURIComponent(results[2].replace(/\+/g, ' '));
+    }
+
+    isSU() {
+        return this.getQueryParam('su') === 'me';
+    }
+
+    isDebug() {
+        return this.getQueryParam('debug') === '1';
     }
 }
 

@@ -4,24 +4,30 @@ class Result {
         this.clear();
     }
 
-    addResult(res) {
+    clear() {
+        this.values = {};
+        this.average = null;
+        this.recommended = null;
+    }
+
+    addResult(res, id) {
         let num = parseFloat(res);
         if (isNaN(num)) {
             num = 0;
         }
-        this.sum += num;
-        this.count += 1;
+        this.values[id] = num;
     }
 
-    clear() {
-        this.average = null;
-        this.recommended = null;
-        this.sum = 0;
-        this.count = 0;
+    collectSum() {
+        let sum = 0;
+        Object.values(this.values).forEach((val) => {
+            sum += val;
+        });
+        return sum;
     }
 
     submit() {
-        this.average = this.sum/this.count;
+        this.average = this.collectSum()/Object.values(this.values).length;
 		this.processRecommended();
     }
 
@@ -31,7 +37,7 @@ class Result {
         ];
         let low = 0;
         let high = 0;
-        for(var i = 0; i < values.length; i++) {
+        for(let i = 0; i < values.length; i++) {
             if (this.average > values[i]) {
                 low = values[i];
             }
@@ -53,6 +59,10 @@ class Result {
                 }
             }
         }
+    }
+
+    stringify() {
+        return JSON.stringify(this);
     }
 
 }
