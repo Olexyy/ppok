@@ -28,7 +28,7 @@ express.get('/room/:id', function (req, res) {
     res.sendFile(path.join(storage, 'index.html'));
 });
 
-http.listen(port, () => console.log(`\x1b[40m`,`\x1b[32m`,
+http.listen(port, () => console.log(`\x1b[32m`,
 `
     [+] Server         : http://0.0.0.0:${port}
     [+] Storage Path   : ${storage}

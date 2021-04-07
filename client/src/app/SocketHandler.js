@@ -30,7 +30,7 @@ class SocketHandler {
             context.state.app.setData(data);
         });
         socket.on('sound', function() {
-            let src = '/ding.mp3';
+            let src = '/ding2.mp3';
             let audio = new Audio(src);
             audio.play();
         });
