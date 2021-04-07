@@ -28,6 +28,7 @@ class App {
         this.data = value;
         let unvoted = false;
         if (Object.prototype.hasOwnProperty.call(value,'players')) {
+            this.result.clear();
             Object.keys(value.players).forEach((id) => {
                 if (value.players[id].vote === '') {
                     unvoted = true;
