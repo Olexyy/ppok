@@ -17,7 +17,7 @@ class App {
     initRoom() {
         let match = window.location.pathname.match(/\/room\/(.+)/);
         if (!match || match.length !== 2) {
-            this.room = 'default';
+            this.room = 'global';
         } else {
             this.room = match[1];
         }
