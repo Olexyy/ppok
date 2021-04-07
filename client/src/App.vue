@@ -17,7 +17,7 @@
     <div class="mdl-layout__drawer">
     <span class="mdl-layout-title">TMPP</span>
     <nav class="mdl-navigation">
-      <!--a class="mdl-navigation__link" href="">Link</a-->
+      <a target="_blank" href="https://en.wikipedia.org/wiki/Planning_poker">TM Planning Poker (v2.0)</a>
     </nav>
     </div>
       <Main/>
