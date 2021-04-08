@@ -12,9 +12,10 @@ class Result {
 
     addResult(res, id) {
         let num = parseFloat(res);
-        if (!isNaN(num)) {
-            this.values[id] = num;
+        if (isNaN(num)) {
+            num = 0;
         }
+        this.values[id] = num;
     }
 
     collectCount() {
@@ -38,7 +39,7 @@ class Result {
     submit() {
         const count = this.collectCount();
         if (count) {
-            this.average = this.collectSum()/this.collectCount();
+            this.average = this.collectSum()/count;
             this.processRecommended();
         }
 
