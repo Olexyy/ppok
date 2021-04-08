@@ -17,6 +17,16 @@ class Result {
         }
     }
 
+    collectCount() {
+        let count = 0;
+        Object.values(this.values).forEach((val) => {
+            if (val > 0) {
+                count += 1;
+            }
+        });
+        return count;
+    }
+
     collectSum() {
         let sum = 0;
         Object.values(this.values).forEach((val) => {
@@ -26,8 +36,12 @@ class Result {
     }
 
     submit() {
-        this.average = this.collectSum()/Object.values(this.values).length;
-		this.processRecommended();
+        const count = this.collectCount();
+        if (count) {
+            this.average = this.collectSum()/this.collectCount();
+            this.processRecommended();
+        }
+
     }
 
     processRecommended() {
