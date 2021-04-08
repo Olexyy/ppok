@@ -12,10 +12,9 @@ class Result {
 
     addResult(res, id) {
         let num = parseFloat(res);
-        if (isNaN(num)) {
-            num = 0;
+        if (!isNaN(num)) {
+            this.values[id] = num;
         }
-        this.values[id] = num;
     }
 
     collectSum() {
