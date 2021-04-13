@@ -4,15 +4,15 @@ const express    = Express();
 const http       = require('http').createServer(express);
 const storage    = path.join(__dirname, "..", 'store');
 const port       = process.env.PORT || 3000;
-const App        = require('./app');
+const AppV2        = require('./appV2');
 /**
  * WebSocket Configuration
  */
 const io = require('socket.io')(http, {});
 /**
-* Tmcpp backend implementation.
+* DGG backend implementation.
 */
-new App(io).bind();
+new AppV2(io).bind();
 /**
  * Static storage.
  */

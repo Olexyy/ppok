@@ -36,9 +36,6 @@
 </template>
 
 <script>
-  import Users from './Users.vue'
-  import Cards from './Cards.vue'
-  import Topic from './Topic.vue'
   export default {
     name: 'Dialogs',
     mounted() {
@@ -58,18 +55,30 @@
         }
       },
       handleEvent(e) {
-        if (e.target.value) {
-          window.localStorage.setItem('pocker_name', e.target.value);
-          this.$store.state.app.emit('update', 'name', e.target.value);
-          this.$refs.name.close();
+        const name = e.target.value;
+        if (name) {
+          if (this.$store.state.app.nameExists(name)) {
+            e.target.parentNode.classList.add('is-invalid');
+          }
+          else {
+            e.target.parentNode.classList.remove('is-invalid');
+            const localData = this.$store.state.app.socketHandler.getData();
+            localData.name = e.target.value;
+            this.$store.state.app.socketHandler.setData(localData);
+            this.$store.state.app.emit('update', this.$store.state.app.ensureUser({
+              name: localData.name
+            }));
+            this.$refs.name.close();
+          }
         }
       },
-	  },
+    },
     computed: {
       userName: {
         get() {
           return this.$store.state.app.userName;
         },
+        // eslint-disable-next-line no-unused-vars
         set(value) { }
       }
     }

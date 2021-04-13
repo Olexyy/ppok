@@ -24,6 +24,12 @@
             <a id="play_sound" v-on:click="playSound" class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
               Play sound
             </a>
+            <a v-if="voting" id="set_voting" v-on:click="setUnVoting" class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
+              Not voting
+            </a>
+            <a v-else id="set_voting" v-on:click="setVoting" class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
+              Voting
+            </a>
           </div>
           <Menu/>
         </div>
@@ -48,14 +54,23 @@
     computed: {
       room() {
         return this.$store.state.app.room;
+      },
+      voting() {
+        return this.$store.state.app.voting;
       }
     },
     methods: {
-      onChangeNameClick(e) {
+      onChangeNameClick() {
         this.$store.state.dialogs.name.showModal();
       },
       playSound() {
-        this.$store.state.app.emit('sound');
+        this.$store.state.app.emit('trigger', 'sound');
+      },
+      setVoting() {
+        this.$store.state.app.emit('update', { vote: '', voting: true});
+      },
+      setUnVoting() {
+        this.$store.state.app.emit('update', { vote: '', voting: false});
       }
     }
   }

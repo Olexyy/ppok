@@ -34,9 +34,7 @@
       ?
     </button>
     <button :disabled="vote === 'break' || !canBeEnabled" v-on:click="onClick" data-value="break" class="mdl-button mdl-card-pocker-card mdl-shadow--2dp mdl-cell mdl-cell--1-col">
-        <span data-value="break" class="material-icons">
-          free_breakfast
-        </span>
+        <span style="font-size: 32px" class="material-icons">coffee</span>
     </button>
   </div>
 </template>
@@ -49,7 +47,7 @@
         if (this.canBeEnabled) {
           const el = e.target;
           const value = el.getAttribute('data-value');
-          this.$store.state.app.emit('update', 'vote', value);
+          this.$store.state.app.emit('update', {vote: value});
         }
       }
     },
@@ -58,7 +56,7 @@
         return this.$store.state.app.vote;
       },
       canBeEnabled() {
-				return this.$store.state.app.discuss === 'discuss' && this.$store.state.app.anyUnvoted;
+				return this.$store.state.app.discuss === 'discuss' && this.$store.state.app.anyUnvoted && this.$store.state.app.voting;
       }
     }
   }

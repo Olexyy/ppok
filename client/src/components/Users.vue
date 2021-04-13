@@ -6,42 +6,60 @@
           <th class="width-fixed-50">№</th>
           <th class="width-minus-100">Name</th>
           <th class="width-fixed-50">Vote</th>
+          <th class="width-fixed-50">Is voting</th>
+          <th class="width-fixed-50">Status</th>
         </tr>
       </thead>
       <tbody v-if="instance" id="table_body">
-        <tr v-for="(player, id, i) in instance.players" :key="`ind-${id}-${i}`">
+        <tr v-for="(player, id, i) in instance.users" :key="`ind-${id}-${i}`">
           <td class="width-fixed-50">{{ i + 1 }}</td>
           <td class="width-minus-100">{{ player.name }}</td>
           <td v-if="su" class="width-fixed-50">
             {{player.vote}}
           </td>
+          <td v-else-if="!player.voting" class="width-fixed-50"></td>
+          <td v-else-if="player.vote === '' && !isOnline(id)" class="width-fixed-50"></td>
           <td v-else-if="player.vote === '' && discuss === 'discuss'" class="width-fixed-50">
-            <img class="wait-throbber" src="./../assets/waiting.gif"/>
+            <img class="wait-throbber" src="./../assets/waiting.gif" alt="waiting"/>
           </td>
           <td v-else-if="discuss === 'discuss' && anyUnvoted" class="width-fixed-50">
-            <span class="material-icons">done</span>
+            <span style="color: gray" class="material-icons">done</span>
           </td>
           <td v-else class="width-fixed-50">
             {{player.vote}}
           </td>
+          <td v-if="player.voting" class="width-fixed-50"><span style="color: gray" class="material-icons">task_alt</span></td>
+          <td v-else class="width-fixed-50"><span style="color: gray" class="material-icons">highlight_off</span></td>
+          <td v-if="isOnline(id)" class="width-fixed-50"><span style="color: gray" class="material-icons">task_alt</span></td>
+          <td v-else class="width-fixed-50"><span style="color: gray" class="material-icons">highlight_off</span></td>
         </tr>
         <tr v-if="average">
           <td class="width-fixed-50">Average:</td>
-          <td style="text-align: left;">{{average}}</td>
+          <td class="width-minus-100" style="text-align: left!important;">{{average}}</td>
+          <th class="width-fixed-50"></th>
+          <th class="width-fixed-50"></th>
+          <td class="width-fixed-50"></td>
         </tr>
         <tr v-if="recommended">
           <td class="width-fixed-50">Recommended:</td>
-          <td style="text-align: left;">{{recommended}}</td>
+          <td class="width-minus-100" style="text-align: left!important;">{{recommended}}</td>
+          <td class="width-fixed-50"></td>
+          <td class="width-fixed-50"></td>
+          <td class="width-fixed-50"></td>
         </tr>
       </tbody>
     </table>
-    <div v-if="debugResult">{{debugResult}}</div>
   </div>
 </template>
 
 <script>
   export default {
     name: 'Users',
+    methods: {
+      isOnline(uuid) {
+        return this.$store.state.app.isOnline(uuid);
+      }
+    },
     computed: {
 			instance() {
 				return this.$store.state.app.data;
@@ -61,12 +79,6 @@
       su() {
         return this.$store.state.app.isSU();
       },
-      debugResult() {
-        if (this.$store.state.app.isDebug()) {
-          return this.$store.state.app.result.stringify();
-        }
-        return '';
-      }
     },
   }
 </script>

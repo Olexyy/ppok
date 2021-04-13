@@ -16,7 +16,7 @@
       Stop discussion
     </button>
     <button
-      :disabled="!topic && discuss === 'idle'"
+      :disabled="topic === '' && discuss === 'idle'"
       v-else
       id="discuss" 
       v-on:click="onDiscussClick"
@@ -44,16 +44,16 @@
       }
     },
     methods: {
-      onDiscussClick(e) {
+      onDiscussClick() {
 				if (this.$store.state.app.discuss === 'idle') {
-          this.$store.state.app.emit('discuss', 'discuss');
-          this.$store.state.app.emit('sound');
+          this.$store.state.app.emit('update', {}, {discuss: 'discuss'});
+          this.$store.state.app.emit('trigger', 'sound');
 				}
         else if (this.$store.state.app.discuss === 'discuss' && this.$store.state.app.anyUnvoted) { 
-					this.$store.state.app.emit('discuss', 'result');
+					this.$store.state.app.emit('update', {}, {discuss: 'result'});
 				}
 				else {
-					this.$store.state.app.emit('clear');
+					this.$store.state.app.emit('bulk', { vote: '' }, { discuss: 'idle', topic: '' });
 				}
       }
     }

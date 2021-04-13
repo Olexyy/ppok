@@ -5,7 +5,7 @@
     <header class="mdl-layout__header">
     <div class="mdl-layout__header-row">
       <!-- Title -->
-      <span class="mdl-layout-title"><a target="_blank" href="https://en.wikipedia.org/wiki/Planning_poker">TM Planning Poker (v2.0)</a></span>
+      <span class="mdl-layout-title"><a target="_blank" href="https://en.wikipedia.org/wiki/Planning_poker">TM Planning poker (v2.0)</a></span>
       <!-- Add spacer, to align navigation to the right -->
       <div class="mdl-layout-spacer"></div>
       <!-- Navigation. We hide it in small screens. -->
@@ -17,10 +17,11 @@
     <div class="mdl-layout__drawer">
     <span class="mdl-layout-title">TMPP</span>
     <nav class="mdl-navigation">
-      <a target="_blank" href="https://en.wikipedia.org/wiki/Planning_poker">TM Planning Poker (v2.0)</a>
+      <a target="_blank" href="https://en.wikipedia.org/wiki/Planning_poker">TM Planning poker (v2.0)</a>
     </nav>
     </div>
       <Main/>
+      <debug/>
     </div>
     <dialogs/>
   </div>
@@ -29,9 +30,11 @@
 <script>
   import Main from './components/Main.vue'
   import Dialogs from './components/Dialogs.vue'
+  import Debug from "./components/Debug";
   export default {
     name: 'App',
     components: {
+      Debug,
       Main,
       Dialogs
     },

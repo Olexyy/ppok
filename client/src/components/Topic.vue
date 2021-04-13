@@ -16,9 +16,7 @@
       :disabled="!validTopic"
       v-on:click="onReferenceClick"
       class="mdl-button mdl-card-pocker-card mdl-shadow--2dp mdl-cell mdl-cell--1-col">
-      <span class="material-icons">
-        open_in_new
-      </span>
+      <span class="material-icons" style="font-size: 32px;">open_in_new</span>
     </button>
   </div>
 </template>
@@ -46,7 +44,7 @@
         }
       },
       handleEvent(e) {
-        this.$store.state.app.emit('topic', e.target.value);
+        this.$store.state.app.emit('update', {}, {topic: e.target.value});
       },
       onChange(e) {
         this.handleClasses(e.target, e.target.value);
@@ -59,7 +57,7 @@
           el.parentNode.classList.remove('is-dirty');
         }
       },
-      onReferenceClick(e) {
+      onReferenceClick() {
         const topic = this.$store.state.app.topic;
         if (topic && this.validUrl(topic)) {
           const win = window.open(topic, '_blank');
@@ -79,7 +77,7 @@
           }
           return this.$store.state.app.topic;
         },
-        set(value) { }
+        set() { }
       },
       validTopic() {
         return this.$store.state.app.topic && this.validUrl(this.$store.state.app.topic);

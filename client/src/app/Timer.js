@@ -4,6 +4,7 @@ class Timer {
         this.sec = 0;
         this.stopped = true;
         this.time = '';
+        this.started = false;
     }
 
     processTime() {
@@ -19,27 +20,33 @@ class Timer {
     }
 
     start() {
-        if (this.stopped) {
-            this.stopped = false;
-            const handle = setInterval(() => {
-                if (this.stopped) {
-                    clearInterval(handle);
-                } else {
-                    this.sec += 1;
-                    this.processTime();
-                }
-            }, 1000);
-            this.processTime();
+        if (!this.started) {
+            this.started = true;
+            if (this.stopped) {
+                this.stopped = false;
+                const handle = setInterval(() => {
+                    if (this.stopped) {
+                        clearInterval(handle);
+                    } else {
+                        this.sec += 1;
+                        this.processTime();
+                    }
+                }, 1000);
+                this.processTime();
+            }
         }
+
     }
 
     stop() {
         this.stopped = true;
+        this.started = false;
     }
 
     clear() {
         this.time = '';
         this.sec = 0;
+        this.stop();
     }
 }
 
