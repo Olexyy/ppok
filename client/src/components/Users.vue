@@ -16,10 +16,10 @@
           <td class="width-fixed-50">{{ i + 1 }}</td>
           <td class="width-minus-100">{{ player.name ? player.name : '[connecting]' }}</td>
           <td v-if="su" class="width-fixed-50">
-            {{ (player.vote && player.vote.length) ? player.vote : 'n/a'}}
+            {{ (player.vote) ? player.vote : 'n/a'}}
           </td>
-          <td v-else-if="!player.voting" class="width-fixed-50"></td>
-          <td v-else-if="player.vote === '' && !isOnline(id)" class="width-fixed-50"></td>
+          <td v-else-if="!player.voting" class="width-fixed-50">n/a</td>
+          <td v-else-if="player.vote === '' && !isOnline(id)" class="width-fixed-50">n/a</td>
           <td v-else-if="player.vote === '' && discuss === 'discuss'" class="width-fixed-50">
             <img class="wait-throbber" src="./../assets/waiting.gif" alt="waiting"/>
           </td>
@@ -27,7 +27,7 @@
             <span style="color: gray" class="material-icons">done</span>
           </td>
           <td v-else class="width-fixed-50">
-            {{player.vote}}
+            {{(player.vote) ? player.vote : 'n/a'}}
           </td>
           <td v-if="player.voting" class="width-fixed-50"><span style="color: gray" class="material-icons">task_alt</span></td>
           <td v-else class="width-fixed-50"><span style="color: gray" class="material-icons">highlight_off</span></td>
