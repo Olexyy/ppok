@@ -11,6 +11,7 @@
               v-on:keypress="onKeyPress"
               class="mdl-textfield__input"
               type="text"
+              data-ref="name"
               id="name"
               name="name">
             <label class="mdl-textfield__label" for="name">Name...</label>
@@ -26,6 +27,7 @@
               v-model="userName"
               v-on:blur="onBlur"
               v-on:keypress="onKeyPress"
+              data-ref="change"
               class="mdl-textfield__input"
               type="text"
               id="name"
@@ -76,10 +78,6 @@
           e.target.blur();
           e.target.parentNode.classList.remove('is-focused');
         }
-        else if (e.keyCode === 27) {
-          e.preventDefault();
-          e.stopPropagation();
-        }
       },
       handleEvent(e) {
         const name = e.target.value;
@@ -95,7 +93,8 @@
             this.$store.state.app.emit('update', this.$store.state.app.buildUser({
               name: localData.name
             }));
-            this.$refs.name.close();
+            const ref = e.target.getAttribute('data-ref');
+            this.$refs[ref].close();
           }
         }
       },
