@@ -10,7 +10,7 @@ const Store = {
 		app: new App(new Timer(), new Result(), new SocketHandler()),
 		dialogs: {},
 	},
-	mutations: { }, // commit mutation...
+	mutations: {}, // commit mutation...
 	actions: {
 		setDialog (context, value) {
 			dialogPolyfill.registerDialog(value.element);

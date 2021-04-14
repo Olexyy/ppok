@@ -3,16 +3,34 @@
       <dialog class="mdl-dialog" ref="name" id="name_dialog">
         <h4 class="mdl-dialog__title">Name yourself</h4>
         <div class="mdl-dialog__content">
+          <p>Field is required, cannot match any existing name.</p>
           <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-          <input 
-            v-model="userName"
-            v-on:blur="onBlur"
-            v-on:keypress="onKeyPress"
-            class="mdl-textfield__input"
-            type="text"
-            id="name"
-            name="name">
-          <label class="mdl-textfield__label" for="Name">Name...</label>
+            <input
+              v-model="userName"
+              v-on:blur="onBlur"
+              v-on:keypress="onKeyPress"
+              class="mdl-textfield__input"
+              type="text"
+              id="name"
+              name="name">
+            <label class="mdl-textfield__label" for="name">Name...</label>
+          </div>
+        </div>
+      </dialog>
+      <dialog class="mdl-dialog" ref="change" id="change_dialog">
+        <h4 class="mdl-dialog__title">Change name</h4>
+        <div class="mdl-dialog__content">
+          <p>Field is required, cannot match any existing name, press ESC to cancel.</p>
+          <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+          <input
+              v-model="userName"
+              v-on:blur="onBlur"
+              v-on:keypress="onKeyPress"
+              class="mdl-textfield__input"
+              type="text"
+              id="name"
+              name="name">
+          <label class="mdl-textfield__label" for="name">Name...</label>
           </div>
         </div>
       </dialog>
@@ -42,16 +60,25 @@
       this.$store.dispatch('setDialog', {name: 'name', element: this.$refs.name});
       this.$store.dispatch('setDialog', {name: 'error', element: this.$refs.error});
       this.$store.dispatch('setDialog', {name: 'start', element: this.$refs.start});
+      this.$store.dispatch('setDialog', {name: 'change', element: this.$refs.change});
+      this.$refs.name.addEventListener('cancel', e => {
+        e.preventDefault();
+      });
     },
     methods: {
       onBlur(e) {
         this.handleEvent(e);
       },
       onKeyPress(e) {
+        console.log(e.keyCode);
         if (e.keyCode === 13) {
           this.handleEvent(e);
           e.target.blur();
           e.target.parentNode.classList.remove('is-focused');
+        }
+        else if (e.keyCode === 27) {
+          e.preventDefault();
+          e.stopPropagation();
         }
       },
       handleEvent(e) {
@@ -62,10 +89,10 @@
           }
           else {
             e.target.parentNode.classList.remove('is-invalid');
-            const localData = this.$store.state.app.socketHandler.getData();
+            const localData = this.$store.state.app.getLocalData();
             localData.name = e.target.value;
-            this.$store.state.app.socketHandler.setData(localData);
-            this.$store.state.app.emit('update', this.$store.state.app.ensureUser({
+            this.$store.state.app.setLocalData(localData);
+            this.$store.state.app.emit('update', this.$store.state.app.buildUser({
               name: localData.name
             }));
             this.$refs.name.close();

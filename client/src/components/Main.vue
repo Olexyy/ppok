@@ -61,7 +61,7 @@
     },
     methods: {
       onChangeNameClick() {
-        this.$store.state.dialogs.name.showModal();
+        this.$store.state.dialogs.change.showModal();
       },
       playSound() {
         this.$store.state.app.emit('trigger', 'sound');

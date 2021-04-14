@@ -1,7 +1,11 @@
 /* eslint-disable no-prototype-builtins */
+import {v4 as uuidV4} from "uuid";
+
 class App {
 
     constructor(timer, result, socketHandler) {
+        // Namespace id.
+        this.appKey = 'poker';
         this.vote = '';
         this.topic = '';
         this.data = null;
@@ -14,6 +18,7 @@ class App {
         this.socketHandler = socketHandler;
         this.socket = null;
         this.voting = true;
+        this.uuid = '';
     }
 
     initRoom() {
@@ -44,8 +49,8 @@ class App {
         return Object(value) === value;
     }
 
-    ensureUser(data) {
-        const uuid = this.socketHandler.getData().uuid;
+    buildUser(data) {
+        const uuid = this.getLocalData().uuid;
         if (!data.hasOwnProperty('uuid')) {
             data.uuid = uuid;
         }
@@ -72,7 +77,7 @@ class App {
 
     isOnline(uuid) {
         let online = false;
-        Object.values(this.data.players).forEach(id => {
+        Object.values(this.data.sockets).forEach(id => {
             if (id === uuid) online = true;
         });
         return online;
@@ -80,18 +85,18 @@ class App {
 
     validateData(value) {
         let valid = this.isObject(value) &&
-            value.hasOwnProperty('players') &&
+            value.hasOwnProperty('sockets') &&
             value.hasOwnProperty('users') &&
             value.hasOwnProperty('state');
         if (valid) {
-            const uuid = this.socketHandler.getData().uuid;
+            const uuid = this.getLocalData().uuid;
             valid = this.isObject(value.users[uuid]);
         }
 
         return valid;
     }
 
-    setData(value, context) {
+    mapData(value, context) {
         // Validate incoming data.
         if (!this.validateData(value)) {
             console.log('Incoming data is invalid.');
@@ -102,15 +107,15 @@ class App {
         }
         // Update fresh data.
         this.data = value;
-        let unVoted = false;
-        const uuid = this.socketHandler.getData().uuid;
-        const user = value.users[uuid] || {};
+        const uuid = this.getLocalData().uuid;
+        this.uuid = uuid;
+        const user = value.users[uuid];
         // This is first time sync.
         if (!user.hasOwnProperty('name')) {
-            const storeData = this.socketHandler.getData();
+            const storeData = this.getLocalData();
             let storeName = storeData.name;
             if (storeData.name !== '' && !this.nameExists(storeName)) {
-                this.emit('update', this.ensureUser({
+                this.emit('update', this.buildUser({
                     name: storeData.name
                 }));
                 return;
@@ -124,6 +129,7 @@ class App {
         this.userName = user.name;
         this.voting = user.voting;
         this.result.clear();
+        let unVoted = false;
         Object.keys(value.users).forEach((id) => {
             if (value.users[id].vote === '') {
                 // Take into account only online users.
@@ -160,7 +166,7 @@ class App {
     }
 
     createSocket(context) {
-        this.socket = this.socketHandler.create(context);
+        this.socket = this.socketHandler.create(this, context);
     }
     // eslint-disable-next-line no-unused-vars
     trigger(name, data, context) {
@@ -201,8 +207,22 @@ class App {
             anyUnVoted: this.anyUnvoted,
             timer: this.timer,
             result: this.result,
-            room: this.room
+            room: this.room,
+            uuid: this.uuid
         };
+    }
+
+    getLocalData() {
+        const data = window.localStorage.getItem(this.appKey);
+        if (!data) {
+            const uuid = uuidV4();
+            return { uuid: uuid, name : ''};
+        }
+        return JSON.parse(data);
+    }
+
+    setLocalData(data) {
+        window.localStorage.setItem(this.appKey, JSON.stringify(data));
     }
 }
 
