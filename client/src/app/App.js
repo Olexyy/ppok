@@ -19,6 +19,11 @@ class App {
         this.socket = null;
         this.voting = true;
         this.uuid = '';
+        this.rooms = [];
+    }
+
+    isGlobalRoom() {
+        return this.room === 'global';
     }
 
     initRoom() {
@@ -87,13 +92,23 @@ class App {
         let valid = this.isObject(value) &&
             value.hasOwnProperty('sockets') &&
             value.hasOwnProperty('users') &&
-            value.hasOwnProperty('state');
+            value.hasOwnProperty('state') &&
+            value.hasOwnProperty('rooms');
         if (valid) {
             const uuid = this.getLocalData().uuid;
             valid = this.isObject(value.users[uuid]);
         }
 
         return valid;
+    }
+
+    doTouch(value) {
+        if (this.isObject(value)) {
+            this.data = value;
+            if (value.hasOwnProperty('rooms')) {
+                this.rooms = value.rooms;
+            }
+        }
     }
 
     mapData(value, context) {
@@ -106,12 +121,13 @@ class App {
             return;
         }
         // Update fresh data.
+        this.rooms = value.rooms;
         this.data = value;
         const uuid = this.getLocalData().uuid;
         this.uuid = uuid;
         const user = value.users[uuid];
         // This is first time sync.
-        if (!user.hasOwnProperty('name')) {
+        if (!user.hasOwnProperty('name') && this.room !== 'global') {
             const storeData = this.getLocalData();
             let storeName = storeData.name;
             if (storeData.name !== '' && !this.nameExists(storeName)) {
@@ -208,8 +224,13 @@ class App {
             timer: this.timer,
             result: this.result,
             room: this.room,
-            uuid: this.uuid
+            uuid: this.uuid,
+            rooms: this.rooms
         };
+    }
+
+    generateUuid() {
+        return uuidV4().toUpperCase();
     }
 
     getLocalData() {

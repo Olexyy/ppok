@@ -5,7 +5,8 @@ class AppV2 {
         this.sockets = io.of('/poker');
         this.app = {
             rooms: {},
-            socketMap: {}
+            socketMap: {},
+            roomNames: []
         };
     }
 
@@ -14,13 +15,16 @@ class AppV2 {
             socket.on('create', (room, uuid) => {
                 this.ensureRoom(room);
                 this.ensureUser(room, socket, uuid);
-                this.sockets.to(room).emit('status', this.app.rooms[room]);
+                this.sockets.to(room).emit('status', Object.assign(this.app.rooms[room], {rooms: this.app.roomNames}));
+            });
+            socket.on('touch', () => {
+                this.sockets.to(socket.id).emit('touch', {rooms: this.app.roomNames});
             });
             socket.on('update', (room, userProps = {}, appProps = {}) => {
                 this.syncApp(room, appProps);
                 const id = this.app.rooms[room].sockets[socket.id];
                 this.syncUser(room, id, userProps);
-                this.sockets.to(room).emit('status', this.app.rooms[room]);
+                this.sockets.to(room).emit('status', Object.assign(this.app.rooms[room], {rooms: this.app.roomNames}));
             });
             socket.on('trigger', (room, name, data = {}) => {
                 this.sockets.to(room).emit('trigger', name, data);
@@ -28,11 +32,11 @@ class AppV2 {
             socket.on('bulk', (room, usersProps = {}, appProps = {}) => {
                 this.syncApp(room, appProps);
                 this.syncUsers(room, usersProps);
-                this.sockets.to(room).emit('status', this.app.rooms[room]);
+                this.sockets.to(room).emit('status', Object.assign(this.app.rooms[room], {rooms: this.app.roomNames}));
             });
             socket.on('kick', (room, uuid) => {
                 this.kickUser(room, uuid);
-                this.sockets.to(room).emit('status', this.app.rooms[room]);
+                this.sockets.to(room).emit('status', Object.assign(this.app.rooms[room], {rooms: this.app.roomNames}));
             });
             socket.on('liveness', () => {
                 console.log(`socket ${socket.id} is live`);
@@ -74,6 +78,7 @@ class AppV2 {
                 users: {},
                 state: {},
             };
+            this.app.roomNames.push(room);
         }
     }
 

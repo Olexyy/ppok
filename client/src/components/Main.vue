@@ -2,7 +2,18 @@
     <main class="mdl-layout__content">
     <div class="page-content">
       <div class="mdl-grid">
-        <div class="demo-card-wide mdl-card mdl-shadow--2dp mdl-cell mdl-cell--12-col">
+        <div v-if="room === 'global'" class="demo-card-wide mdl-card mdl-shadow--2dp mdl-cell mdl-cell--12-col">
+          <div class="mdl-card__title">
+            <h3 class="mdl-card__title-text">
+              <span id='room_marker'>
+                <b v-if="room">Welcome to TM Planning Poker</b>
+              </span>
+            </h3>
+          </div>
+          <div class="mdl-card__actions mdl-card--border"></div>
+          <Join/>
+        </div>
+        <div v-else class="demo-card-wide mdl-card mdl-shadow--2dp mdl-cell mdl-cell--12-col">
           <div class="mdl-card__title">
             <h3 class="mdl-card__title-text">
               <span id='room_marker'>
@@ -43,13 +54,15 @@
   import Cards from './Cards.vue'
   import Topic from './Topic.vue'
   import Menu from './Menu.vue'
+  import Join from "./Join";
   export default {
     name: 'Main',
     components: {
       Users,
       Cards,
       Topic,
-      Menu
+      Menu,
+      Join,
     },
     computed: {
       room() {
