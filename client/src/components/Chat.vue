@@ -1,34 +1,16 @@
 <template>
-  <div class="mdl-cell mdl-cell--3-col">
+  <div class="mdl-cell mdl-cell--4-col">
     <table id="table" class="mdl-data-table mdl-js-data-table mdl-shadow--2dp mdl-cell mdl-cell--12-col">
       <thead>
         <tr>
           <th class="width-fixed-50">№</th>
           <th class="width-minus-100">Name</th>
-          <th class="width-fixed-50">Vote</th>
-          <th class="width-fixed-50">Status</th>
         </tr>
       </thead>
       <tbody v-if="instance" id="table_body">
         <tr v-for="(player, id, i) in instance.users" :key="`ind-${id}-${i}`">
           <td class="width-fixed-50">{{ i + 1 }}</td>
           <td class="width-minus-100">{{ player.name ? player.name : '[connecting]' }}</td>
-          <td v-if="su" class="width-fixed-50">
-            {{ (player.vote) ? player.vote : 'n/a'}}
-          </td>
-          <td v-else-if="!player.voting" class="width-fixed-50">n/a</td>
-          <td v-else-if="player.vote === '' && !isOnline(id)" class="width-fixed-50">n/a</td>
-          <td v-else-if="player.vote === '' && discuss === 'discuss'" class="width-fixed-50">
-            <img class="wait-throbber" src="./../assets/waiting.gif" alt="waiting"/>
-          </td>
-          <td v-else-if="discuss === 'discuss' && anyUnvoted" class="width-fixed-50">
-            <span style="color: gray" class="material-icons">done</span>
-          </td>
-          <td v-else class="width-fixed-50">
-            {{(player.vote) ? player.vote : 'n/a'}}
-          </td>
-          <td v-if="player.voting" class="width-fixed-50"><span style="color: gray" class="material-icons">task_alt</span></td>
-          <td v-else class="width-fixed-50"><span style="color: gray" class="material-icons">highlight_off</span></td>
         </tr>
       </tbody>
     </table>
@@ -37,7 +19,7 @@
 
 <script>
   export default {
-    name: 'Users',
+    name: 'Chat',
     methods: {
       isOnline(uuid) {
         return this.$store.state.app.isOnline(uuid);

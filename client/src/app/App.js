@@ -19,6 +19,9 @@ class App {
         this.socket = null;
         this.voting = true;
         this.uuid = '';
+        //////
+        this.editingUser = '';
+        this.imageData = '';
     }
 
     initRoom() {
@@ -163,6 +166,14 @@ class App {
             this.timer.clear();
             this.result.clear();
         }
+        //////
+        this.imageData = value.state.imageData || '';
+        this.editingUser = value.state.editingUser || '';
+        // If this is not editing user.
+        if (this.editingUser !== '' && this.editingUser !== this.uuid) {
+            // https://github.com/carstenschaefer/DrawerJs/wiki/Public-API
+            window.$('.editable-canvas-not-edited').attr('src', this.imageData);
+        }
     }
 
     createSocket(context) {
@@ -208,7 +219,9 @@ class App {
             timer: this.timer,
             result: this.result,
             room: this.room,
-            uuid: this.uuid
+            uuid: this.uuid,
+            editingUser: this.editingUser,
+            imageData: this.imageData
         };
     }
 

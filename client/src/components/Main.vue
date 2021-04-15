@@ -14,9 +14,12 @@
             Write topic and click start to indicate discussion starts.
           </div>
           <div class="mdl-card__actions mdl-card--border"></div>
-          <Topic/>  
-          <Cards/>
-          <Users/>
+          <Topic/>
+          <div class="mdl-grid" style="width: 100%">
+            <Users/>
+            <Drawer/>
+            <Chat/>
+          </div>
           <div class="mdl-card__actions mdl-card--border">
             <a id="change_name" v-on:click="onChangeNameClick" class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
               Change name
@@ -30,6 +33,12 @@
             <a v-else id="set_voting" v-on:click="setVoting" class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
               Voting
             </a>
+            <a v-on:click="startEdit" class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
+              Start edit
+            </a>
+            <a v-on:click="stopEdit" class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
+              Stop edit
+            </a>
           </div>
           <Menu/>
         </div>
@@ -40,16 +49,19 @@
 
 <script>
   import Users from './Users.vue'
-  import Cards from './Cards.vue'
   import Topic from './Topic.vue'
   import Menu from './Menu.vue'
+  import Drawer from "./Drawer.vue";
+  import Worker from "../app/Worker";
+  import Chat from "./Chat";
   export default {
     name: 'Main',
     components: {
       Users,
-      Cards,
       Topic,
-      Menu
+      Menu,
+      Drawer,
+      Chat
     },
     computed: {
       room() {
@@ -71,6 +83,20 @@
       },
       setUnVoting() {
         this.$store.state.app.emit('update', { vote: '', voting: false});
+      },
+      startEdit() {
+        window.drawer.api.startEditing();
+        this.$store.state.app.emit('update', {}, { editingUser: this.$store.state.app.uuid });
+        window.drawerWorker = new Worker(() => {
+          const imageData = window.drawer.api.getCanvasAsImage();
+          this.$store.state.app.emit('update', {}, { imageData: imageData });
+        }, 1000);
+        window.drawerWorker.start();
+      },
+      stopEdit() {
+        window.drawer.api.stopEditing();
+        window.drawerWorker.stop();
+        this.$store.state.app.emit('update', {}, { editingUser: '', imageData: '' });
       }
     }
   }
