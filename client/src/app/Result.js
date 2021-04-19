@@ -63,11 +63,11 @@ class Result {
                 high = values[i];
                 let valLow = this.recommended - low;
                 let valHigh = high - this.recommended;
-                if (valLow < valHigh) {
+                if (valLow <= valHigh) {
                     this.recommended = low;
                     break;
                 }
-                else if (valLow > valHigh) {
+                else {
                     this.recommended = high;
                     break;
                 }
