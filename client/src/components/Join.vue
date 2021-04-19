@@ -48,7 +48,7 @@
           if (!room.length) {
             e.target.parentNode.classList.add('is-invalid');
           }
-          if (this.$store.state.app.rooms.includes(room)) {
+          if (Object.keys(this.$store.state.app.rooms).includes(room)) {
             e.target.parentNode.classList.add('is-invalid');
           }
           else {
