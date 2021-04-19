@@ -5,7 +5,7 @@
     </div>
     <div class="mdl-card__supporting-text">
       Select room:<br/>
-      <a v-for="(item) in rooms" :href="`/room/${item}`" :key="item" class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">{{item}}</a>
+      <a v-for="(item, name, i) in rooms" :href="`/room/${name}`" :key="`${name}-${i}`" class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">{{`${name} (${item.users})`}}</a>
     </div>
     <div class="mdl-card__supporting-text">
       New room:<br/>
@@ -99,7 +99,10 @@
     },
     computed: {
       rooms() {
-        return this.$store.state.app.rooms.filter((i) => { return i!=='global'; }).slice(0,3);
+        return Object.keys(this.$store.state.app.rooms).slice(0,5).reduce((obj, key) => {
+          obj[key] = this.$store.state.app.rooms[key];
+          return obj;
+        }, {});
       },
       uuid() {
         return this.$store.state.app.generateUuid();

@@ -5,8 +5,7 @@ class AppV2 {
         this.sockets = io.of('/poker');
         this.app = {
             rooms: {},
-            socketMap: {},
-            roomNames: []
+            socketMap: {}
         };
     }
 
@@ -15,16 +14,16 @@ class AppV2 {
             socket.on('create', (room, uuid) => {
                 this.ensureRoom(room);
                 this.ensureUser(room, socket, uuid);
-                this.sockets.to(room).emit('status', Object.assign(this.app.rooms[room], {rooms: this.app.roomNames}));
+                this.sockets.to(room).emit('status', this.app.rooms[room]);
             });
-            socket.on('touch', () => {
-                this.sockets.to(socket.id).emit('touch', {rooms: this.app.roomNames});
+            socket.on('touch', (roomProps = {}) => {
+                this.sockets.to(socket.id).emit('touch', {rooms: this.collectRooms(roomProps)});
             });
             socket.on('update', (room, userProps = {}, appProps = {}) => {
                 this.syncApp(room, appProps);
                 const id = this.app.rooms[room].sockets[socket.id];
                 this.syncUser(room, id, userProps);
-                this.sockets.to(room).emit('status', Object.assign(this.app.rooms[room], {rooms: this.app.roomNames}));
+                this.sockets.to(room).emit('status', this.app.rooms[room]);
             });
             socket.on('trigger', (room, name, data = {}) => {
                 this.sockets.to(room).emit('trigger', name, data);
@@ -32,11 +31,11 @@ class AppV2 {
             socket.on('bulk', (room, usersProps = {}, appProps = {}) => {
                 this.syncApp(room, appProps);
                 this.syncUsers(room, usersProps);
-                this.sockets.to(room).emit('status', Object.assign(this.app.rooms[room], {rooms: this.app.roomNames}));
+                this.sockets.to(room).emit('status', this.app.rooms[room]);
             });
             socket.on('kick', (room, uuid) => {
                 this.kickUser(room, uuid);
-                this.sockets.to(room).emit('status', Object.assign(this.app.rooms[room], {rooms: this.app.roomNames}));
+                this.sockets.to(room).emit('status', this.app.rooms[room]);
             });
             socket.on('liveness', () => {
                 console.log(`socket ${socket.id} is live`);
@@ -48,6 +47,33 @@ class AppV2 {
                 this.deleteUser(socket.id);
             });
         });
+    }
+
+    collectRooms(roomProps) {
+        const rooms = {};
+        Object.keys(this.app.rooms).forEach(room => {
+            rooms[room] = {};
+            Object.keys(roomProps).forEach(key => {
+                if (this.app.rooms[room].hasOwnProperty(key)) {
+                    if (Object(roomProps[key]) === roomProps[key]) {
+                        Object.keys(roomProps[key]).forEach(subKey => {
+                            if (this.app.rooms[room][key].hasOwnProperty(subKey)) {
+                                rooms[room][key][subKey] = this.app.rooms[room][key][subKey];
+                            }
+                        });
+                    }
+                    else if (roomProps[key] === '$count') {
+                        if (Object(this.app.rooms[room][key]) === this.app.rooms[room][key]) {
+                            rooms[room][key] = Object.keys(this.app.rooms[room][key]).length;
+                        }
+                    }
+                    // else {
+                    //     rooms[room] = this.app.rooms[room].state[key];
+                    // }
+                }
+            });
+        });
+        return rooms;
     }
 
     syncApp(room, appProps) {
@@ -78,7 +104,6 @@ class AppV2 {
                 users: {},
                 state: {},
             };
-            this.app.roomNames.push(room);
         }
     }
 

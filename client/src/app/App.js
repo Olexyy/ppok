@@ -19,7 +19,7 @@ class App {
         this.socket = null;
         this.voting = true;
         this.uuid = '';
-        this.rooms = [];
+        this.rooms = {};
     }
 
     isGlobalRoom() {
@@ -92,8 +92,7 @@ class App {
         let valid = this.isObject(value) &&
             value.hasOwnProperty('sockets') &&
             value.hasOwnProperty('users') &&
-            value.hasOwnProperty('state') &&
-            value.hasOwnProperty('rooms');
+            value.hasOwnProperty('state');
         if (valid) {
             const uuid = this.getLocalData().uuid;
             valid = this.isObject(value.users[uuid]);

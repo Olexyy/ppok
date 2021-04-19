@@ -16,10 +16,8 @@ class SocketHandler {
             const localStore = app.getLocalData();
             app.setLocalData(localStore);
             if (app.isGlobalRoom()) {
-                console.log('touch');
-                socket.emit('touch', app.room, localStore.uuid);
+                socket.emit('touch', { users: '$count' });
             } else {
-                console.log('create');
                 socket.emit('create', app.room, localStore.uuid);
             }
         });
