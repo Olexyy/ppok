@@ -9,8 +9,8 @@
           <th class="width-fixed-50">Status</th>
         </tr>
       </thead>
-      <tbody v-if="instance" id="table_body">
-        <tr v-for="(player, id, i) in instance.users" :key="`ind-${id}-${i}`">
+      <tbody v-if="dataExists" id="table_body">
+        <tr v-for="(player, id, i) in userList" :key="`ind-${id}-${i}`">
           <td class="width-fixed-50">{{ i + 1 }}</td>
           <td class="width-minus-100">{{ player.name ? player.name : '[connecting]' }}</td>
           <td v-if="su" class="width-fixed-50">
@@ -48,8 +48,17 @@
       }
     },
     computed: {
-			instance() {
-				return this.$store.state.app.data;
+      dataExists() {
+        return !!this.$store.state.app.data;
+      },
+			userList() {
+				return Object.keys(this.$store.state.app.data.users)
+            // eslint-disable-next-line no-prototype-builtins
+            .filter(k => this.$store.state.app.data.users[k].hasOwnProperty('name') && this.$store.state.app.data.users[k].name.length)
+            .reduce((obj, key) => {
+              obj[key] = this.$store.state.app.data.users[key];
+              return obj;
+            }, {});
       },
       app() {
         return this.$store.state.app;

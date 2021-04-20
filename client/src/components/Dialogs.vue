@@ -52,6 +52,27 @@
           </p>
         </div>
       </dialog>
+<!--      <dialog class="mdl-dialog" ref="choose" id="choose_dialog">-->
+<!--        <h4 class="mdl-dialog__title">Choose or create room</h4>-->
+<!--        <div class="mdl-dialog__content">-->
+<!--          <div>Choose room or create new from proposal or own.</div>-->
+<!--          <div v-if="rooms.length">Select room</div>-->
+<!--          <a v-for="(item) in rooms" :href="`/room/${item}`" :key="item">{{item}}</a>-->
+<!--          <div v-if="rooms.length">New room</div>-->
+<!--          <a :href="'room/'+ uuid">{{uuid}}</a>-->
+<!--          <div class="mdl-textfield mdl-js-textfield mdl-textfield&#45;&#45;floating-label">-->
+<!--            <input-->
+<!--              v-on:blur="onBlurRoom"-->
+<!--              v-on:keypress="onKeyPressRoom"-->
+<!--              class="mdl-textfield__input"-->
+<!--              type="text"-->
+<!--              data-ref="room"-->
+<!--              id="room"-->
+<!--              name="room">-->
+<!--            <label class="mdl-textfield__label" for="room">Custom room...</label>-->
+<!--          </div>-->
+<!--        </div>-->
+<!--      </dialog>-->
     </span>
 </template>
 
@@ -63,11 +84,38 @@
       this.$store.dispatch('setDialog', {name: 'error', element: this.$refs.error});
       this.$store.dispatch('setDialog', {name: 'start', element: this.$refs.start});
       this.$store.dispatch('setDialog', {name: 'change', element: this.$refs.change});
+      //this.$store.dispatch('setDialog', {name: 'choose', element: this.$refs.choose});
       this.$refs.name.addEventListener('cancel', e => {
         e.preventDefault();
       });
     },
     methods: {
+      // onBlurRoom(e) {
+      //   this.handleEventRoom(e);
+      // },
+      // onKeyPressRoom(e) {
+      //   console.log(e.keyCode);
+      //   if (e.keyCode === 13) {
+      //     this.handleEventRoom(e);
+      //     e.target.blur();
+      //     e.target.parentNode.classList.remove('is-focused');
+      //   }
+      // },
+      // handleEventRoom(e) {
+      //   const room = e.target.value;
+      //   if (room) {
+      //     if (!room.length) {
+      //       e.target.parentNode.classList.add('is-invalid');
+      //     }
+      //     if (this.$store.state.app.rooms.includes(room)) {
+      //       e.target.parentNode.classList.add('is-invalid');
+      //     }
+      //     else {
+      //       e.target.parentNode.classList.remove('is-invalid');
+      //       window.location.href = `/room/${room}`;
+      //     }
+      //   }
+      // },
       onBlur(e) {
         this.handleEvent(e);
       },
@@ -100,6 +148,12 @@
       },
     },
     computed: {
+      // rooms() {
+      //   return this.$store.state.app.rooms.filter((i) => {return i!=='global';}).slice(0,3);
+      // },
+      // uuid() {
+      //   return this.$store.state.app.generateUuid();
+      // },
       userName: {
         get() {
           return this.$store.state.app.userName;

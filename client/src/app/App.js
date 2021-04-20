@@ -22,6 +22,11 @@ class App {
         //////
         this.editingUser = '';
         this.imageData = '';
+        this.rooms = {};
+    }
+
+    isGlobalRoom() {
+        return this.room === 'global';
     }
 
     initRoom() {
@@ -99,6 +104,15 @@ class App {
         return valid;
     }
 
+    doTouch(value) {
+        if (this.isObject(value)) {
+            this.data = value;
+            if (value.hasOwnProperty('rooms')) {
+                this.rooms = value.rooms;
+            }
+        }
+    }
+
     mapData(value, context) {
         // Validate incoming data.
         if (!this.validateData(value)) {
@@ -109,12 +123,13 @@ class App {
             return;
         }
         // Update fresh data.
+        this.rooms = value.rooms;
         this.data = value;
         const uuid = this.getLocalData().uuid;
         this.uuid = uuid;
         const user = value.users[uuid];
         // This is first time sync.
-        if (!user.hasOwnProperty('name')) {
+        if (!user.hasOwnProperty('name') && this.room !== 'global') {
             const storeData = this.getLocalData();
             let storeName = storeData.name;
             if (storeData.name !== '' && !this.nameExists(storeName)) {
@@ -220,9 +235,14 @@ class App {
             result: this.result,
             room: this.room,
             uuid: this.uuid,
+            rooms: this.rooms,
             editingUser: this.editingUser,
             imageData: this.imageData
         };
+    }
+
+    generateUuid() {
+        return uuidV4().toUpperCase();
     }
 
     getLocalData() {

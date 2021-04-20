@@ -16,6 +16,9 @@ class AppV2 {
                 this.ensureUser(room, socket, uuid);
                 this.sockets.to(room).emit('status', this.app.rooms[room]);
             });
+            socket.on('touch', (roomProps = {}) => {
+                this.sockets.to(socket.id).emit('touch', {rooms: this.collectRooms(roomProps)});
+            });
             socket.on('update', (room, userProps = {}, appProps = {}) => {
                 this.syncApp(room, appProps);
                 const id = this.app.rooms[room].sockets[socket.id];
@@ -44,6 +47,33 @@ class AppV2 {
                 this.deleteUser(socket.id);
             });
         });
+    }
+
+    collectRooms(roomProps) {
+        const rooms = {};
+        Object.keys(this.app.rooms).forEach(room => {
+            rooms[room] = {};
+            Object.keys(roomProps).forEach(key => {
+                if (this.app.rooms[room].hasOwnProperty(key)) {
+                    if (Object(roomProps[key]) === roomProps[key]) {
+                        Object.keys(roomProps[key]).forEach(subKey => {
+                            if (this.app.rooms[room][key].hasOwnProperty(subKey)) {
+                                rooms[room][key][subKey] = this.app.rooms[room][key][subKey];
+                            }
+                        });
+                    }
+                    else if (roomProps[key] === '$count') {
+                        if (Object(this.app.rooms[room][key]) === this.app.rooms[room][key]) {
+                            rooms[room][key] = Object.keys(this.app.rooms[room][key]).length;
+                        }
+                    }
+                    // else {
+                    //     rooms[room] = this.app.rooms[room].state[key];
+                    // }
+                }
+            });
+        });
+        return rooms;
     }
 
     syncApp(room, appProps) {

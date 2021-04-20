@@ -15,22 +15,33 @@ class SocketHandler {
             // Generate local identifier if any.
             const localStore = app.getLocalData();
             app.setLocalData(localStore);
-            socket.emit('create', app.room, localStore.uuid);
+            if (app.isGlobalRoom()) {
+                socket.emit('touch', { users: '$count' });
+            } else {
+                socket.emit('create', app.room, localStore.uuid);
+            }
         });
         socket.on('error', () => {
-            context.state.dialogs.error.showModal();
+            if (!context.state.dialogs.error.hasAttribute('open')) {
+                context.state.dialogs.error.showModal();
+            }
         });
         socket.on('disconnect', () => {
-            context.state.dialogs.error.showModal();
+            if (!context.state.dialogs.error.hasAttribute('open')) {
+                context.state.dialogs.error.showModal();
+            }
         });
         socket.on('status', data => {
             app.mapData(data, context);
+        });
+        socket.on('touch', data => {
+            app.doTouch(data, context);
         });
         socket.on('trigger', (name, data) => {
             app.trigger(name, data, context);
         });
         socket.on('kick', () => {
-            socket.disconnect();
+            socket.close();
         });
         const liveness = () => {
             setTimeout(function() {
