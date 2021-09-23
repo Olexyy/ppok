@@ -1,5 +1,5 @@
 <template>
-  <div class="mdl-cell mdl-cell--5-col" style="min-height: 550px;">
+  <div class="mdl-cell mdl-cell--4-col mdl-cell--8-col-tablet mdl-cell--6-col-phone" style="min-height: 550px;">
     <div style="height: 100%; padding: 5px" class="wrapper-element">
       <div id="canvas-editor">
       </div>

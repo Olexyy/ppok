@@ -2,7 +2,7 @@ class AppV2 {
 
     constructor(io) {
         this.io = io;
-        this.sockets = io.of('/poker');
+        this.sockets = io.of('/dgg');
         this.app = {
             rooms: {},
             socketMap: {}

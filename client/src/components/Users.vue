@@ -1,6 +1,6 @@
 <template>
-  <div class="mdl-cell mdl-cell--3-col">
-    <table id="table" class="mdl-data-table mdl-js-data-table mdl-shadow--2dp mdl-cell mdl-cell--12-col">
+  <div class="mdl-cell mdl-cell--4-col mdl-cell--8-col-tablet mdl-cell--6-col-phone">
+    <table id="table" class="mdl-data-table mdl-js-data-table mdl-shadow--2dp">
       <thead>
         <tr>
           <th class="width-fixed-50">№</th>

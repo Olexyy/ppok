@@ -5,7 +5,7 @@ class App {
 
     constructor(timer, result, socketHandler) {
         // Namespace id.
-        this.appKey = 'poker';
+        this.appKey = 'dgg';
         this.vote = '';
         this.topic = '';
         this.data = null;
@@ -23,6 +23,7 @@ class App {
         this.editingUser = '';
         this.imageData = '';
         this.rooms = {};
+        this.chat = [];
     }
 
     isGlobalRoom() {
@@ -123,11 +124,11 @@ class App {
             return;
         }
         // Update fresh data.
-        this.rooms = value.rooms;
         this.data = value;
         const uuid = this.getLocalData().uuid;
         this.uuid = uuid;
         const user = value.users[uuid];
+        this.chat = value.state.chat || [];
         // This is first time sync.
         if (!user.hasOwnProperty('name') && this.room !== 'global') {
             const storeData = this.getLocalData();

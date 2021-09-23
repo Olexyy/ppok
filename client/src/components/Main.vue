@@ -65,6 +65,7 @@
   import Drawer from "./Drawer.vue";
   import Chat from "./Chat";
   import Join from "./Join";
+  import Worker from "../app/Worker";
   export default {
     name: 'Main',
     components: {
