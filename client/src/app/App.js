@@ -157,12 +157,19 @@ class App {
         if ((!this.anyUnvoted && this.discuss === 'discuss') || this.discuss === 'result') {
             this.timer.stop();
             this.result.submit();
+            this.playSound();
         }
         // If we have initial phase.
         if (this.discuss === 'idle') {
             this.timer.clear();
             this.result.clear();
         }
+    }
+
+    playSound() {
+        let src = '/pop_50.mp3';
+        let audio = new Audio(src);
+        audio.play();
     }
 
     createSocket(context) {
