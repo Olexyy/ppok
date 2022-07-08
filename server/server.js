@@ -3,7 +3,7 @@ const path       = require('path');
 const express    = Express();
 const http       = require('http').createServer(express);
 const storage    = path.join(__dirname, "..", 'store');
-const port       = process.env.PORT || 3000;
+const port       = process.env.PORT || 3001;
 const AppV2        = require('./appV2');
 /**
  * WebSocket Configuration
