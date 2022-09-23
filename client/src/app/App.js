@@ -172,6 +172,7 @@ class App {
         if ((!this.anyUnvoted && this.discuss === 'discuss') || this.discuss === 'result') {
             this.timer.stop();
             this.result.submit();
+            this.playSound();
         }
         // If we have initial phase.
         if (this.discuss === 'idle') {
@@ -180,13 +181,19 @@ class App {
         }
     }
 
+    playSound() {
+        let src = '/pop_50.mp3';
+        let audio = new Audio(src);
+        audio.play();
+    }
+
     createSocket(context) {
         this.socket = this.socketHandler.create(this, context);
     }
     // eslint-disable-next-line no-unused-vars
     trigger(name, data, context) {
         if (name === 'sound') {
-            let src = '/ding2.mp3';
+            let src = '/pop_50.mp3';
             let audio = new Audio(src);
             audio.play();
         }
