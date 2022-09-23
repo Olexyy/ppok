@@ -21,9 +21,9 @@
             <a id="change_name" v-on:click="onChangeNameClick" class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
               Change name
             </a>
-            <a id="play_sound" v-on:click="playSound" class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
-              Play sound
-            </a>
+<!--            <a id="play_sound" v-on:click="playSound" class="mdl-button mdl-button&#45;&#45;colored mdl-js-button mdl-js-ripple-effect">-->
+<!--              Play sound-->
+<!--            </a>-->
             <a v-if="voting" id="set_voting" v-on:click="setUnVoting" class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
               Not voting
             </a>
