@@ -167,7 +167,7 @@ class App {
     }
 
     playSound() {
-        let src = '/pop_50.mp3';
+        let src = '/sound2.mp3';
         let audio = new Audio(src);
         audio.play();
     }
@@ -178,7 +178,7 @@ class App {
     // eslint-disable-next-line no-unused-vars
     trigger(name, data, context) {
         if (name === 'sound') {
-            let src = '/pop_50.mp3';
+            let src = '/sound2.mp3';
             let audio = new Audio(src);
             audio.play();
         }
